@@ -3,7 +3,7 @@ import { Chessboard } from 'react-chessboard';
 import { useGame } from './Game';
 
 export default function Board() {
-  const { fen, makeMove, makeRandomMove } = useGame();
+  const { fen, makeMove, makeAiMove } = useGame();
 
   function onDrop(sourceSquare: Square, targetSquare: Square): boolean {
     const valid = makeMove({
@@ -12,7 +12,7 @@ export default function Board() {
     });
 
     if (valid) {
-      setTimeout(() => makeRandomMove(), 0);
+      setTimeout(() => makeAiMove(), 0);
     }
 
     return valid;

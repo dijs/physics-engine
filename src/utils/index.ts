@@ -1,7 +1,6 @@
+import { Chess, Square } from 'chess.js';
 
-import { Chess, Square } from "chess.js";
-
-type Dictionary = { [index: string]: number }
+type Dictionary = { [index: string]: number };
 
 const PAWN = 'p';
 const KNIGHT = 'n';
@@ -50,14 +49,20 @@ function getMoveScore(chess: Chess, move: string) {
       return -1;
     }
     if (type) {
-    return PieceScores[type];
+      return PieceScores[type];
     }
   }
   return 0;
 }
 
-
-export function minMax(chess: Chess, value: number, depth: number, maximizing:boolean, alpha = -Infinity, beta = Infinity) {
+export function minMax(
+  chess: Chess,
+  value: number,
+  depth: number,
+  maximizing: boolean,
+  alpha = -Infinity,
+  beta = Infinity
+) {
   if (depth === 0) {
     return value;
   }
@@ -92,7 +97,7 @@ export function minMax(chess: Chess, value: number, depth: number, maximizing:bo
 
 export function findMaxMove(chess: Chess, depth = 2) {
   let bestScore = -Infinity;
-  let bestMove = null;
+  let bestMove = undefined;
   for (const move of chess.moves()) {
     chess.move(move);
     const score = minMax(chess, getMoveScore(chess, move), depth, false);
@@ -108,63 +113,9 @@ export function findMaxMove(chess: Chess, depth = 2) {
 
 export function getRandomMove(chess: Chess) {
   const possibleMoves = chess.moves();
-  return possibleMoves[Math.floor(Math.random() * possibleMoves.length)];
+  if (chess.isGameOver() || chess.isDraw() || possibleMoves.length === 0) {
+    return undefined; // exit if the game is over
+  }
+  const randomIndex = Math.floor(Math.random() * possibleMoves.length);
+  return possibleMoves[randomIndex];
 }
-
-// const MoveFinders = {
-//   random: getRandomMove,
-//   d0: () => findMaxMove(0),
-//   d1: () => findMaxMove(1),
-//   d2: () => findMaxMove(2),
-//   d3: () => findMaxMove(3),
-// };
-
-// const wins = {
-//   w: 0,
-//   b: 0,
-// };
-
-// const times = {
-//   w: 0,
-//   b: 0,
-// };
-
-// function playMatch(depth) {
-//   chess.reset();
-//   let moveCount = 0;
-//   while (!chess.isGameOver()) {
-//     let started = Date.now();
-//     const player = chess.turn();
-//     if (player === 'w') {
-//       chess.move(MoveFinders.random());
-//     } else {
-//       chess.move(findMaxMove(depth));
-//     }
-//     let took = Date.now() - started;
-//     times[player] += took;
-//     console.log(player, 'took', took, 'ms');
-//     moveCount++;
-//     console.log(chess.ascii());
-//   }
-
-//   console.log('Average White Move took', times.w / moveCount / 2, 'ms');
-//   console.log('Average Black Move took', times.b / moveCount / 2, 'ms');
-
-//   console.log(
-//     'Game over in',
-//     moveCount,
-//     'moves',
-//     {
-//       winner: chess.turn(),
-//       isCheckmate: chess.isCheckmate(),
-//       isStalemate: chess.isStalemate(),
-//       isDraw: chess.isDraw(),
-//     },
-//     '\n'
-//   );
-
-//   if (chess.isCheckmate()) {
-//     wins[chess.turn()]++;
-//   }
-// }
-
