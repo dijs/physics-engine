@@ -4,12 +4,14 @@ import { createContext, useContext, useRef, useState } from 'react';
 type Move = string | { from: Square; to: Square };
 
 type GameContextType = {
+  game: Chess;
   fen: string;
   makeMove: (move: Move) => boolean;
   makeRandomMove: () => boolean;
 };
 
 export const GameContext = createContext<GameContextType>({
+  game: new Chess(),
   fen: '',
   makeMove: () => false,
   makeRandomMove: () => false,
@@ -49,7 +51,9 @@ export function GameProvider({ children }: { children: JSX.Element }) {
   }
 
   return (
-    <GameContext.Provider value={{ fen, makeMove, makeRandomMove }}>
+    <GameContext.Provider
+      value={{ game: game.current, fen, makeMove, makeRandomMove }}
+    >
       {children}
     </GameContext.Provider>
   );

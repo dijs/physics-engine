@@ -1,7 +1,7 @@
 import Head from 'next/head';
-import styles from 'styles/Home.module.css';
 import Board from 'components/Board';
 import { GameProvider } from 'components/Game';
+import Status from 'components/Status';
 
 export default function Home() {
   return (
@@ -12,9 +12,14 @@ export default function Home() {
         <meta name="viewport" content="width=device-width, initial-scale=1" />
         <link rel="icon" href="/favicon.ico" />
       </Head>
-      <main className={styles.main}>
+      <main>
         <GameProvider>
-          <Board />
+          <div style={{ display: 'flex' }}>
+            <div style={{ width: 800 }}>
+              <Board />
+            </div>
+            <Status />
+          </div>
         </GameProvider>
       </main>
     </>
