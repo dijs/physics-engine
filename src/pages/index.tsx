@@ -1,6 +1,7 @@
 import Head from 'next/head';
 import styles from 'styles/Home.module.css';
 import Board from 'components/Board';
+import { GameProvider } from 'components/Game';
 
 export default function Home() {
   return (
@@ -12,7 +13,9 @@ export default function Home() {
         <link rel="icon" href="/favicon.ico" />
       </Head>
       <main className={styles.main}>
-        <Board />
+        <GameProvider>
+          <Board />
+        </GameProvider>
       </main>
     </>
   );
