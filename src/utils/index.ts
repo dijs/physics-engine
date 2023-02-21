@@ -97,9 +97,8 @@ function inferPieceType(san: string): string | undefined {
 // }
 
 function negaMax(chess: Chess, depth: number) {
-  // Try both colors here...
   if (depth === 0) {
-    return getBoardScore(chess, chess.turn() === 'b' ? 'w' : 'b');
+    return getBoardScore(chess, opp(chess.turn()));
   }
   let max = -Infinity;
   for (let move of chess.moves()) {
@@ -111,6 +110,30 @@ function negaMax(chess: Chess, depth: number) {
     }
   }
   return max;
+}
+
+function negaMaxWithAlphaBeta(
+  chess: Chess,
+  depth: number,
+  alpha: number = -Infinity,
+  beta: number = Infinity
+): number {
+  let best = -Infinity;
+  // if( depth == 0 ) return quiesce( alpha, beta );
+  if (depth === 0) {
+    return getBoardScore(chess, opp(chess.turn()));
+  }
+  for (let move of chess.moves()) {
+    chess.move(move);
+    const score = -negaMaxWithAlphaBeta(chess, depth - 1, -beta, -alpha);
+    chess.undo();
+    if (score >= beta) return score; // fail-soft beta-cutoff
+    if (score > best) {
+      best = score;
+      if (score > alpha) alpha = score; // alpha acts like max in MiniMax
+    }
+  }
+  return best;
 }
 
 export function minMax(
@@ -129,6 +152,7 @@ export function minMax(
   for (const move of chess.moves()) {
     chess.move(move);
     const score = getBoardScore(chess, opp(chess.turn()));
+
     const result = minMax(
       chess,
       maximizing ? score : -score,
@@ -160,9 +184,10 @@ export function findMaxMove(chess: Chess, depth: number) {
   for (const move of chess.moves()) {
     // const color = chess.turn();
     chess.move(move);
+    const score = negaMaxWithAlphaBeta(chess, depth);
     // const score = negaMax(chess, depth);
     // const initialScore = getBoardScore(chess, chess.turn() === 'b' ? 'w' : 'b');
-    const score = minMax(chess, -Infinity, depth, false);
+    // const score = minMax(chess, -Infinity, depth, false);
     chess.undo();
     if (score > bestScore) {
       bestScore = score;
