@@ -51,6 +51,8 @@ export function GameProvider({ children }: { children: JSX.Element }) {
   }
 
   function makeAiMove() {
+    if (!game.current.moves()) return false;
+
     let started = Date.now();
     let move: string | undefined = undefined;
     if (aiType === AiType.Random) {
@@ -70,9 +72,6 @@ export function GameProvider({ children }: { children: JSX.Element }) {
     }
     let took = Date.now() - started;
     console.log('ai move took', took, 'ms');
-    if (!move) {
-      throw new Error('AI did not find a move');
-    }
     if (move) {
       return makeMove(move);
     } else {

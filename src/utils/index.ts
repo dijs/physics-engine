@@ -15,11 +15,59 @@ const PieceScores: Dictionary = {
   [BISHOP]: 3,
   [ROOK]: 5,
   [QUEEN]: 9,
-  [KING]: 0,
+  [KING]: 200,
 };
 
 function strippedSan(move: string) {
   return move.replace(/=/, '').replace(/[+#]?[?!]*$/, '');
+}
+
+function getPieceCounts(chess: Chess, color: string) {
+  const board = chess.board();
+  const counts: { [index: string]: number } = {
+    b: 0,
+    k: 0,
+    n: 0,
+    p: 0,
+    q: 0,
+    r: 0,
+  };
+  for (let row = 0; row < 8; row++) {
+    for (let col = 0; col < 8; col++) {
+      const piece = board[row][col];
+      if (piece && piece.color === color) {
+        counts[piece.type]++;
+      }
+    }
+  }
+  return counts;
+}
+
+// Uses both material and mobility to determine the score of the board
+export function getBoardScore(chess: Chess, color: string) {
+  // console.log(chess.board());
+  const pCounts = getPieceCounts(chess, color);
+  const oCounts = getPieceCounts(chess, color === 'w' ? 'b' : 'w');
+
+  let score = 0;
+
+  for (let type in pCounts) {
+    score += PieceScores[type] * (pCounts[type] - oCounts[type]);
+  }
+
+  // 0.5 *
+  // (pCounts.d - oCounts.d + pCounts.s - oCounts.s + pCounts.i - oCounts.i) +
+  // 0.1 * (pCounts.m - oCounts.m);
+
+  return score;
+
+  // 200(K-K')
+  //      + 9(Q-Q')
+  //      + 5(R-R')
+  //      + 3(B-B' + N-N')
+  //      + 1(P-P')
+  //      - 0.5(D-D' + S-S' + I-I')
+  //      + 0.1(M-M') +
 }
 
 function inferPieceType(san: string): string | undefined {

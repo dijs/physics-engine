@@ -1,3 +1,4 @@
+import { getBoardScore } from 'src/utils';
 import { AiType, useGame } from './Game';
 
 export default function Status() {
@@ -6,7 +7,9 @@ export default function Status() {
     <div>
       status
       <hr />
-      <div>{game.turn()}</div>
+      <div>turn = {game.turn()}</div>
+      <div>white score = {getBoardScore(game, 'w')}</div>
+      <div>black score = {getBoardScore(game, 'b')}</div>
       {game.isGameOver() ? <div>game over</div> : <></>}
       {game.isCheckmate() ? <div>checkmate</div> : <></>}
       {game.isDraw() ? <div>draw</div> : <></>}

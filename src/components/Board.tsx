@@ -12,7 +12,7 @@ export default function Board() {
     });
 
     if (valid) {
-      setTimeout(() => makeAiMove(), 0);
+      setTimeout(() => makeAiMove(), 10);
     }
 
     return valid;
