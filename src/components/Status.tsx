@@ -1,8 +1,8 @@
 import { findMaxMove, getBoardScore } from 'src/utils';
-import { AiType, useGame } from './Game';
+import { useGame } from './Game';
 
 export default function Status() {
-  const { game, fen, setAiType, aiType, makeMove, findAiMove } = useGame();
+  const { game, fen, depth, setDepth, makeMove, findAiMove } = useGame();
 
   function tick() {
     const move = findMaxMove(game, 2);
@@ -25,18 +25,14 @@ export default function Status() {
       <br />
       <textarea value={fen} readOnly />
       <br />
-      <select
-        value={aiType}
-        onChange={(e) => setAiType(e.target.value as unknown as AiType)}
-      >
-        {Object.keys(AiType)
-          .filter((k) => isNaN(k as any))
-          .map((type) => (
-            <option key={type} value={type}>
-              {type}
-            </option>
-          ))}
-      </select>
+      <label>
+        depth:
+        <input
+          type={'number'}
+          value={depth}
+          onChange={(e) => setDepth(e.target.valueAsNumber)}
+        />
+      </label>
       <br />
       <div>best move: {findAiMove()}</div>
       <button onClick={tick}>Tick</button>
