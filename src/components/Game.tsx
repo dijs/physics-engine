@@ -5,7 +5,7 @@ import { findMaxMove, getRandomMove } from 'src/utils';
 type Move = string | { from: Square; to: Square };
 
 export enum AiType {
-  Random = 'Random',
+  // Random = 'Random',
   D0 = 'D0',
   D1 = 'D1',
   D2 = 'D2',
@@ -18,6 +18,7 @@ type GameContextType = {
   aiType: AiType;
   makeMove: (move: Move) => boolean;
   makeRandomMove: () => boolean;
+  findAiMove: () => string;
   makeAiMove: () => boolean;
   setAiType: (aiType: AiType) => void;
 };
@@ -25,17 +26,23 @@ type GameContextType = {
 export const GameContext = createContext<GameContextType>({
   game: new Chess(),
   fen: '',
-  aiType: AiType.Random,
+  aiType: AiType.D0,
   makeMove: () => false,
   makeRandomMove: () => false,
+  findAiMove: () => '',
   makeAiMove: () => false,
   setAiType: () => false,
 });
 
 export function GameProvider({ children }: { children: JSX.Element }) {
+  const [fen, setFen] = useState(
+    '8/8/6k1/5p2/8/8/K7/5R2 w - - 2 2'
+    // 'r5rk/1pp1qpn1/p2p3p/3P4/2PQNP1b/1P3B1P/P6K/5RR1 w - - 0 31'
+  );
   const game = useRef(new Chess());
-  const [fen, setFen] = useState(game.current.fen());
-  const [aiType, setAiType] = useState(AiType.Random);
+  const [aiType, setAiType] = useState(AiType.D0);
+
+  game.current.load(fen);
 
   function makeMove(move: string | { from: Square; to: Square }) {
     let valid = true;
@@ -50,14 +57,11 @@ export function GameProvider({ children }: { children: JSX.Element }) {
     return valid;
   }
 
-  function makeAiMove() {
-    if (!game.current.moves()) return false;
-
+  function findAiMove() {
+    if (!game.current.moves()) return undefined;
+    console.log('ai thinking...');
     let started = Date.now();
     let move: string | undefined = undefined;
-    if (aiType === AiType.Random) {
-      move = getRandomMove(game.current);
-    }
     if (aiType === AiType.D0) {
       move = findMaxMove(game.current, 0);
     }
@@ -72,6 +76,11 @@ export function GameProvider({ children }: { children: JSX.Element }) {
     }
     let took = Date.now() - started;
     console.log('ai move took', took, 'ms');
+    return move;
+  }
+
+  function makeAiMove() {
+    const move = findAiMove();
     if (move) {
       return makeMove(move);
     } else {
@@ -98,6 +107,7 @@ export function GameProvider({ children }: { children: JSX.Element }) {
         makeMove,
         makeRandomMove,
         makeAiMove,
+        findAiMove,
       }}
     >
       {children}

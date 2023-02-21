@@ -43,31 +43,23 @@ function getPieceCounts(chess: Chess, color: string) {
   return counts;
 }
 
+const opp = (color: string) => (color === 'w' ? 'b' : 'w');
+
+// Source: https://www.chessprogramming.org/Evaluation
 // Uses both material and mobility to determine the score of the board
 export function getBoardScore(chess: Chess, color: string) {
-  // console.log(chess.board());
   const pCounts = getPieceCounts(chess, color);
-  const oCounts = getPieceCounts(chess, color === 'w' ? 'b' : 'w');
+  const oCounts = getPieceCounts(chess, opp(color));
 
-  let score = 0;
+  let material = 0;
 
   for (let type in pCounts) {
-    score += PieceScores[type] * (pCounts[type] - oCounts[type]);
+    material += PieceScores[type] * (pCounts[type] - oCounts[type]);
   }
 
-  // 0.5 *
-  // (pCounts.d - oCounts.d + pCounts.s - oCounts.s + pCounts.i - oCounts.i) +
-  // 0.1 * (pCounts.m - oCounts.m);
+  const mobility = chess.moves().length * 0.1;
 
-  return score;
-
-  // 200(K-K')
-  //      + 9(Q-Q')
-  //      + 5(R-R')
-  //      + 3(B-B' + N-N')
-  //      + 1(P-P')
-  //      - 0.5(D-D' + S-S' + I-I')
-  //      + 0.1(M-M') +
+  return material + mobility;
 }
 
 function inferPieceType(san: string): string | undefined {
@@ -86,21 +78,39 @@ function inferPieceType(san: string): string | undefined {
   return pieceType;
 }
 
-function getMoveScore(chess: Chess, move: string) {
-  if (move.includes('x')) {
-    const cleanMove = strippedSan(move);
-    const squareTaken = cleanMove.split('x')[1] as Square;
-    let type: string | undefined;
-    try {
-      type = inferPieceType(chess.get(squareTaken).type);
-    } catch (err) {
-      return -1;
-    }
-    if (type) {
-      return PieceScores[type];
+// function getMoveScore(chess: Chess, color: string) {
+//   return getBoardScore(chess, color);
+// if (move.includes('x')) {
+//   const cleanMove = strippedSan(move);
+//   const squareTaken = cleanMove.split('x')[1] as Square;
+//   let type: string | undefined;
+//   try {
+//     type = inferPieceType(chess.get(squareTaken).type);
+//   } catch (err) {
+//     return -1;
+//   }
+//   if (type) {
+//     return PieceScores[type];
+//   }
+// }
+// return 0;
+// }
+
+function negaMax(chess: Chess, depth: number) {
+  // Try both colors here...
+  if (depth === 0) {
+    return getBoardScore(chess, chess.turn() === 'b' ? 'w' : 'b');
+  }
+  let max = -Infinity;
+  for (let move of chess.moves()) {
+    chess.move(move);
+    const score = -negaMax(chess, depth - 1);
+    chess.undo();
+    if (score > max) {
+      max = score;
     }
   }
-  return 0;
+  return max;
 }
 
 export function minMax(
@@ -117,11 +127,12 @@ export function minMax(
   let maxValue = -Infinity;
   let minValue = Infinity;
   for (const move of chess.moves()) {
-    const score = getMoveScore(chess, move);
     chess.move(move);
+    const score = getBoardScore(chess, opp(chess.turn()));
     const result = minMax(
       chess,
-      maximizing ? value + score : value - score,
+      maximizing ? score : -score,
+      // maximizing ? value + score : value - score,
       depth - 1,
       !maximizing,
       alpha,
@@ -143,12 +154,15 @@ export function minMax(
   return maxValue;
 }
 
-export function findMaxMove(chess: Chess, depth = 2) {
+export function findMaxMove(chess: Chess, depth: number) {
   let bestScore = -Infinity;
   let bestMove = undefined;
   for (const move of chess.moves()) {
+    // const color = chess.turn();
     chess.move(move);
-    const score = minMax(chess, getMoveScore(chess, move), depth, false);
+    // const score = negaMax(chess, depth);
+    // const initialScore = getBoardScore(chess, chess.turn() === 'b' ? 'w' : 'b');
+    const score = minMax(chess, -Infinity, depth, false);
     chess.undo();
     if (score > bestScore) {
       bestScore = score;

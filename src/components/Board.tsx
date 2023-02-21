@@ -10,11 +10,9 @@ export default function Board() {
       from: sourceSquare,
       to: targetSquare,
     });
-
     if (valid) {
       setTimeout(() => makeAiMove(), 10);
     }
-
     return valid;
   }
 

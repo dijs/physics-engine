@@ -1,8 +1,16 @@
-import { getBoardScore } from 'src/utils';
+import { findMaxMove, getBoardScore } from 'src/utils';
 import { AiType, useGame } from './Game';
 
 export default function Status() {
-  const { game, fen, setAiType, aiType } = useGame();
+  const { game, fen, setAiType, aiType, makeMove, findAiMove } = useGame();
+
+  function tick() {
+    const move = findMaxMove(game, 2);
+    if (move) {
+      makeMove(move);
+    }
+  }
+
   return (
     <div>
       status
@@ -14,7 +22,9 @@ export default function Status() {
       {game.isCheckmate() ? <div>checkmate</div> : <></>}
       {game.isDraw() ? <div>draw</div> : <></>}
       {game.isStalemate() ? <div>stalemate</div> : <></>}
-      <div style={{ opacity: 0 }}>{fen}</div>
+      <br />
+      <textarea value={fen} readOnly />
+      <br />
       <select
         value={aiType}
         onChange={(e) => setAiType(e.target.value as unknown as AiType)}
@@ -27,6 +37,9 @@ export default function Status() {
             </option>
           ))}
       </select>
+      <br />
+      <div>best move: {findAiMove()}</div>
+      <button onClick={tick}>Tick</button>
     </div>
   );
 }
