@@ -95,7 +95,7 @@ export function getMoveScore(chess: Chess, move: string) {
   return 0;
 }
 
-export function getBoardEvaluation(chess: Chess) {
+function getMaterialScore(chess: Chess) {
   const board = chess.board();
   let material = 0;
   for (let row = 0; row < 8; row++) {
@@ -111,8 +111,9 @@ export function getBoardEvaluation(chess: Chess) {
       }
     }
   }
-
-  // console.log(lastBoard, '\nRelative Score:', material, 'for', color);
-
   return material;
+}
+
+export function getBoardEvaluation(chess: Chess) {
+  return getMaterialScore(chess);
 }
