@@ -1,4 +1,5 @@
-import { findMaxMove, getBoardScore } from 'src/utils';
+import { findMaxMove } from 'src/utils';
+import { getBoardEvaluation } from 'src/utils/evals';
 import { useGame } from './Game';
 
 export default function Status() {
@@ -16,8 +17,8 @@ export default function Status() {
       status
       <hr />
       <div>turn = {game.turn()}</div>
-      <div>white score = {getBoardScore(game, 'w')}</div>
-      <div>black score = {getBoardScore(game, 'b')}</div>
+      <div>white score = {getBoardEvaluation(game)}</div>
+      <div>black score = {-getBoardEvaluation(game)}</div>
       {game.isGameOver() ? <div>game over</div> : <></>}
       {game.isCheckmate() ? <div>checkmate</div> : <></>}
       {game.isDraw() ? <div>draw</div> : <></>}
