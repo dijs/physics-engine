@@ -1,6 +1,7 @@
 import { Chess } from 'chess.js';
 import { getBoardEvaluation } from './evals';
 
+// Fail soft
 export default function abMinMax(
   chess: Chess,
   depth: number,
@@ -12,30 +13,30 @@ export default function abMinMax(
     return getBoardEvaluation(chess);
   }
   if (isMaximizing) {
-    let best = -Infinity;
+    let max = -Infinity;
     for (let move of chess.moves()) {
       chess.move(move);
       const score = abMinMax(chess, depth - 1, false, alpha, beta);
       chess.undo();
-      best = Math.max(best, score);
-      if (best > beta) {
+      max = Math.max(max, score);
+      alpha = Math.max(alpha, max);
+      if (max >= beta) {
         break;
       }
-      alpha = Math.max(alpha, best);
     }
-    return best;
+    return max;
   } else {
-    let best = Infinity;
+    let min = Infinity;
     for (let move of chess.moves()) {
       chess.move(move);
       const score = abMinMax(chess, depth - 1, true, alpha, beta);
       chess.undo();
-      best = Math.min(best, score);
-      if (best < alpha) {
+      min = Math.min(min, score);
+      beta = Math.min(beta, min);
+      if (min <= alpha) {
         break;
       }
-      beta = Math.min(beta, best);
     }
-    return best;
+    return min;
   }
 }

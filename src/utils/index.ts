@@ -12,9 +12,7 @@ export function findMaxMove(chess: Chess, depth: number) {
   // Sort before searching
   moves.sort((a, b) => getMoveScore(chess, b) - getMoveScore(chess, a));
 
-  // console.log('Moves are', moves);
-
-  // const color = chess.turn();
+  console.log('Moves are', moves);
 
   for (const move of moves) {
     chess.move(move);
