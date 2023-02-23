@@ -28,8 +28,8 @@ export const GameContext = createContext<GameContextType>({
 
 export function GameProvider({ children }: { children: JSX.Element }) {
   const [fen, setFen] = useState(
-    '8/8/6k1/5p2/8/8/K7/5R2 w - - 2 2'
-    // 'r5rk/1pp1qpn1/p2p3p/3P4/2PQNP1b/1P3B1P/P6K/5RR1 w - - 0 31'
+    '1K6/8/8/8/8/8/5pk1/5R2 w - - 2 9'
+    // '8/8/6k1/5p2/8/8/K7/5R2 w - - 2 2'
   );
   const game = useRef(new Chess());
   const [depth, setDepth] = useState(0);

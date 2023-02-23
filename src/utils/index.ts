@@ -57,9 +57,9 @@ export function getBoardScore(chess: Chess, color: string) {
     material += PieceScores[type] * (pCounts[type] - oCounts[type]);
   }
 
-  const mobility = chess.moves().length * 0.1;
+  // const mobility = chess.moves().length * 0.1;
 
-  return material + mobility;
+  return material;
 }
 
 function inferPieceType(san: string): string | undefined {
@@ -78,123 +78,167 @@ function inferPieceType(san: string): string | undefined {
   return pieceType;
 }
 
-// function getMoveScore(chess: Chess, color: string) {
-//   return getBoardScore(chess, color);
-// if (move.includes('x')) {
-//   const cleanMove = strippedSan(move);
-//   const squareTaken = cleanMove.split('x')[1] as Square;
-//   let type: string | undefined;
-//   try {
-//     type = inferPieceType(chess.get(squareTaken).type);
-//   } catch (err) {
-//     return -1;
-//   }
-//   if (type) {
-//     return PieceScores[type];
-//   }
-// }
-// return 0;
-// }
-
-function negaMax(chess: Chess, depth: number) {
-  if (depth === 0) {
-    return getBoardScore(chess, opp(chess.turn()));
-  }
-  let max = -Infinity;
-  for (let move of chess.moves()) {
-    chess.move(move);
-    const score = -negaMax(chess, depth - 1);
-    chess.undo();
-    if (score > max) {
-      max = score;
+function getMoveScore(chess: Chess, move: string) {
+  if (move.includes('x')) {
+    const cleanMove = strippedSan(move);
+    const squareTaken = cleanMove.split('x')[1] as Square;
+    let type: string | undefined;
+    try {
+      type = inferPieceType(chess.get(squareTaken).type);
+    } catch (err) {
+      return -1;
+    }
+    if (type) {
+      return PieceScores[type];
     }
   }
-  return max;
+  return 0;
 }
 
-function negaMaxWithAlphaBeta(
+function pvs(
   chess: Chess,
   depth: number,
-  alpha: number = -Infinity,
-  beta: number = Infinity
-): number {
-  let best = -Infinity;
-  // if( depth == 0 ) return quiesce( alpha, beta );
-  if (depth === 0) {
-    return getBoardScore(chess, opp(chess.turn()));
-  }
-  for (let move of chess.moves()) {
-    chess.move(move);
-    const score = -negaMaxWithAlphaBeta(chess, depth - 1, -beta, -alpha);
-    chess.undo();
-    if (score >= beta) return score; // fail-soft beta-cutoff
-    if (score > best) {
-      best = score;
-      if (score > alpha) alpha = score; // alpha acts like max in MiniMax
-    }
-  }
-  return best;
-}
-
-export function minMax(
-  chess: Chess,
-  value: number,
-  depth: number,
-  maximizing: boolean,
-  alpha = -Infinity,
-  beta = Infinity
+  // color: string,
+  isMaximizing: boolean
+  // alpha: number = -Infinity,
+  // beta: number = Infinity,
 ) {
+  searched++;
+  // if (depth === 0 || chess.isGameOver()) {
   if (depth === 0) {
-    return value;
+    return getBoardEvaluation(chess);
   }
-  let maxValue = -Infinity;
-  let minValue = Infinity;
-  for (const move of chess.moves()) {
-    chess.move(move);
-    const score = getBoardScore(chess, opp(chess.turn()));
 
-    const result = minMax(
+  let min = Infinity;
+  let max = -Infinity;
+
+  for (let move of chess.moves()) {
+    chess.move(move);
+    const score = pvs(
       chess,
-      maximizing ? score : -score,
-      // maximizing ? value + score : value - score,
       depth - 1,
-      !maximizing,
-      alpha,
-      beta
+      // opp(color),
+      !isMaximizing
+      // -beta,
+      // -alpha,
     );
+    max = Math.max(max, score);
+    min = Math.min(min, score);
     chess.undo();
-    maxValue = Math.max(maxValue, result);
-    minValue = Math.min(minValue, result);
-    // Add some alpha beta pruning
-    if (maximizing) {
-      alpha = Math.max(alpha, maxValue);
-    } else {
-      beta = Math.min(beta, minValue);
-    }
-    if (beta <= alpha) {
-      break;
+  }
+  return isMaximizing ? max : min;
+}
+
+// function negaMax(chess: Chess, depth: number) {
+//   if (depth === 0) {
+//     return getBoardScore(chess, opp(chess.turn()));
+//   }
+//   let max = -Infinity;
+//   for (let move of chess.moves()) {
+//     chess.move(move);
+//     const score = -negaMax(chess, depth - 1);
+//     chess.undo();
+//     if (score > max) {
+//       max = score;
+//     }
+//   }
+//   return max;
+// }
+
+// let lastBoard = '';
+
+function getBoardEvaluation(chess: Chess) {
+  // const lastBoard = chess.ascii();
+
+  const board = chess.board();
+  let material = 0;
+  for (let row = 0; row < 8; row++) {
+    for (let col = 0; col < 8; col++) {
+      const piece = board[row][col];
+      if (piece) {
+        const score = PieceScores[piece.type];
+        if (piece.color === 'w') {
+          material += score;
+        } else {
+          material -= score;
+        }
+      }
     }
   }
-  return maxValue;
+
+  // console.log(lastBoard, '\nRelative Score:', material, 'for', color);
+
+  return material;
 }
+
+// function negaMaxWithAlphaBeta(
+//   chess: Chess,
+//   depth: number,
+//   currentPlayer: string,
+//   ogPlayer: string
+//   // alpha: number = -Infinity,
+//   // beta: number = Infinity
+// ): number {
+//   searched++;
+//   if (depth === 0) {
+//     return getBoardEvaluation(chess, ogPlayer);
+//   }
+//   let best = -Infinity;
+//   for (let move of chess.moves()) {
+//     chess.move(move);
+//     const score = -negaMaxWithAlphaBeta(
+//       chess,
+//       depth - 1,
+//       opp(currentPlayer),
+//       ogPlayer
+//     );
+//     // const score = -negaMaxWithAlphaBeta(chess, depth - 1, -beta, -alpha);
+//     chess.undo();
+//     // if (score >= beta) return score; // fail-soft beta-cutoff
+//     if (score > best) {
+//       best = score;
+//       //   if (score > alpha) alpha = score; // alpha acts like max in MiniMax
+//     }
+//   }
+//   return best;
+// }
+
+let searched = 0;
 
 export function findMaxMove(chess: Chess, depth: number) {
   let bestScore = -Infinity;
   let bestMove = undefined;
-  for (const move of chess.moves()) {
-    // const color = chess.turn();
+  searched = 0;
+
+  let moves = chess.moves();
+
+  // Sort before searching
+  moves.sort((a, b) => getMoveScore(chess, b) - getMoveScore(chess, a));
+
+  // console.log('Moves are', moves);
+
+  const color = chess.turn();
+
+  for (const move of moves) {
     chess.move(move);
-    const score = negaMaxWithAlphaBeta(chess, depth);
-    // const score = negaMax(chess, depth);
-    // const initialScore = getBoardScore(chess, chess.turn() === 'b' ? 'w' : 'b');
-    // const score = minMax(chess, -Infinity, depth, false);
+    const score = pvs(chess, depth, false);
     chess.undo();
     if (score > bestScore) {
       bestScore = score;
       bestMove = move;
+      console.log('New best move is', bestMove, 'with score', bestScore);
     }
   }
-  console.log('Best move is', bestMove, 'with score', bestScore);
+
+  console.log(
+    'Best move is',
+    bestMove,
+    'with score',
+    bestScore,
+    'after searching',
+    searched,
+    'nodes'
+  );
   return bestMove;
 }
 

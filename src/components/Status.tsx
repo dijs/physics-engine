@@ -5,7 +5,7 @@ export default function Status() {
   const { game, fen, depth, setDepth, makeMove, findAiMove } = useGame();
 
   function tick() {
-    const move = findMaxMove(game, 2);
+    const move = findMaxMove(game, depth);
     if (move) {
       makeMove(move);
     }
