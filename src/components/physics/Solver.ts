@@ -63,11 +63,14 @@ export default class Solver {
           this.objects[j].position
         );
         const distance = collisionAxis.length();
-        const k = this.objects[i].radius + this.objects[j].radius;
-        if (distance < k) {
-          const n = collisionAxis.times(1 / distance);
-          const delta = k - distance;
-          const move = n.times(delta * 0.5);
+        const radiusSum = this.objects[i].radius + this.objects[j].radius;
+        // Detect overlaps
+        if (distance < radiusSum) {
+          const axis_direction = collisionAxis.times(1 / distance);
+          // Calculate the overlap
+          const overlap = radiusSum - distance;
+          // We move both objects by half the overlap
+          const move = axis_direction.times(overlap * 0.5);
           this.objects[i].move(move);
           this.objects[j].move(move.negate());
         }
