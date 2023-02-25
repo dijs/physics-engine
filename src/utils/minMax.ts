@@ -4,7 +4,7 @@ import { getBoardEvaluation } from './evals';
 export default function minMax(
   chess: Chess,
   depth: number,
-  isMaximizing: boolean
+  isMaximizing: boolean = true
 ) {
   if (depth === 0) {
     return getBoardEvaluation(chess);

@@ -9,6 +9,9 @@ const ROOK = 'r';
 const QUEEN = 'q';
 const KING = 'k';
 
+const WHITE = 'w';
+const BLACK = 'b';
+
 const PieceScores: Dictionary = {
   [PAWN]: 1,
   [KNIGHT]: 3,
@@ -43,7 +46,7 @@ function getPieceCounts(chess: Chess, color: string) {
   return counts;
 }
 
-const opp = (color: string) => (color === 'w' ? 'b' : 'w');
+const opp = (color: string) => (color === WHITE ? BLACK : WHITE);
 
 // Source: https://www.chessprogramming.org/Evaluation
 // Uses both material and mobility to determine the score of the board
@@ -96,19 +99,20 @@ export function getMoveScore(chess: Chess, move: string) {
 }
 
 function getMaterialScore(chess: Chess) {
-  const board = chess.board();
   let material = 0;
-  for (let row = 0; row < 8; row++) {
-    for (let col = 0; col < 8; col++) {
-      const piece = board[row][col];
-      if (piece) {
-        const score = PieceScores[piece.type];
-        if (piece.color === 'w') {
-          material += score;
-        } else {
-          material -= score;
-        }
+  // raw board access
+  for (let i = 0; i <= 119; i++) {
+    const p = chess['_board'][i];
+    if (p) {
+      const score = PieceScores[p.type];
+      if (p.color === WHITE) {
+        material += score;
+      } else {
+        material -= score;
       }
+    }
+    if ((i + 1) & 0x88) {
+      i += 8;
     }
   }
   return material;

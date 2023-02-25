@@ -1,7 +1,7 @@
 import { Chess } from 'chess.js';
 import abMinMax from './abMinMax';
 import { getMoveScore } from './evals';
-// import minMax from './minMax';
+import minMax from './minMax';
 
 export function findMaxMove(chess: Chess, depth: number) {
   let bestScore = -Infinity;
@@ -10,13 +10,15 @@ export function findMaxMove(chess: Chess, depth: number) {
   const moves = chess.moves();
 
   // Sort before searching
-  moves.sort((a, b) => getMoveScore(chess, b) - getMoveScore(chess, a));
+  // moves.sort((a, b) => Math.random() - 0.5);
+  // moves.sort((a, b) => getMoveScore(chess, b) - getMoveScore(chess, a));
 
   console.log('Moves are', moves);
 
   for (const move of moves) {
     chess.move(move);
     const score = abMinMax(chess, depth);
+    // const score = minMax(chess, depth);
     chess.undo();
     if (score > bestScore) {
       bestScore = score;
