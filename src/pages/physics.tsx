@@ -3,6 +3,18 @@ import { useEffect, useRef } from 'react';
 // Source: https://www.youtube.com/watch?v=lS_qeBy3aQI
 
 // TODO: Make radius a property of the VerletObject
+// TODO: Extract classes to separate files
+
+const randomInt = (min: number, max: number) => {
+  return Math.floor(Math.random() * (max - min + 1)) + min;
+};
+
+function randomColor() {
+  var h = randomInt(0, 360);
+  var s = randomInt(42, 98);
+  var l = randomInt(40, 90);
+  return `hsl(${h},${s}%,${l}%)`;
+}
 
 function clearScreen(ctx: CanvasRenderingContext2D) {
   ctx.fillStyle = 'black';
@@ -91,15 +103,15 @@ class VerletCircle extends VerletObject {
 }
 
 function Solver() {
-  const objects: VerletObject[] = [];
+  const objects: VerletCircle[] = [];
 
-  function addObject(object: VerletObject) {
+  function addObject(object: VerletCircle) {
     objects.push(object);
   }
 
   function update(dt: number) {
     applyGravity();
-    applyConstraint();
+    applyConstraint(Vec2(400, 300), 200);
     solveCollisions();
     updatePositions(dt);
   }
@@ -116,17 +128,13 @@ function Solver() {
     }
   }
 
-  function applyConstraint() {
-    const center = Vec2(400, 300);
-    const radius = 200;
-
+  function applyConstraint(center: Vec2, radius: number) {
     for (const object of objects) {
       const delta = object.position.sub(center);
       const dist = delta.length();
-      // 20 is ball radius
-      if (dist > radius - 20) {
+      if (dist > radius - object.radius) {
         const n = delta.times(1 / dist);
-        object.setPosition(center.add(n.times(radius - 20)));
+        object.setPosition(center.add(n.times(radius - object.radius)));
       }
     }
   }
@@ -138,8 +146,7 @@ function Solver() {
         if (i === j) continue;
         const collisionAxis = objects[i].position.sub(objects[j].position);
         const distance = collisionAxis.length();
-        // TODO: Make dynamic based on objects
-        const k = 40; // radius of each ball added together
+        const k = objects[i].radius + objects[j].radius;
         if (distance < k) {
           const n = collisionAxis.times(1 / distance);
           const delta = k - distance;
@@ -176,15 +183,13 @@ export default function PhysicsPage() {
   useEffect(() => {
     const ctx = canvas.current?.getContext('2d');
     if (ctx) {
-      solver.current.addObject(new VerletCircle(500, 150));
-
       clearInterval(interval.current);
       interval.current = setInterval(() => {
         clearScreen(ctx);
-
+        // Draw constraint area
         drawBall(ctx, 400, 300, 200, 'white');
-
         solver.current.update(frameTime);
+        // Draw balls
         for (let i = 0; i < solver.current.count(); i++) {
           const ball = solver.current.get(i) as VerletCircle;
           drawBall(
@@ -196,13 +201,13 @@ export default function PhysicsPage() {
           );
         }
       }, 1000 / 60);
-
-      console.log('Physics page loaded');
     }
   });
 
   function handleClick() {
-    solver.current.addObject(new VerletCircle(500, 150));
+    solver.current.addObject(
+      new VerletCircle(500, 150, randomInt(10, 30), randomColor())
+    );
   }
 
   return (
