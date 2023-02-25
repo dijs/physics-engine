@@ -3,7 +3,7 @@ import { clearScreen, drawBall, randomColor, randomInt } from './utils';
 import VerletCircle from './VerletCircle';
 
 const frameTime = 1 / 60;
-const spawnTime = 200;
+const spawnTime = 100;
 
 export default class Simulation {
   private solver = new Solver();
