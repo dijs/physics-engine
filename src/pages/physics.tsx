@@ -1,5 +1,9 @@
 import { useEffect, useRef } from 'react';
 
+// Source: https://www.youtube.com/watch?v=lS_qeBy3aQI
+
+// TODO: Make radius a property of the VerletObject
+
 function clearScreen(ctx: CanvasRenderingContext2D) {
   ctx.fillStyle = 'black';
   ctx.fillRect(0, 0, 800, 600);
@@ -25,6 +29,7 @@ type Vec2 = {
   add: (v: Vec2) => Vec2;
   times: (n: number) => Vec2;
   distance: (v: Vec2) => number;
+  length: () => number;
 };
 
 function Vec2(x = 0, y = 0) {
@@ -35,6 +40,7 @@ function Vec2(x = 0, y = 0) {
     add: (v: Vec2) => Vec2(x + v.x, y + v.y),
     times: (n: number) => Vec2(x * n, y * n),
     distance: (v: Vec2) => Math.sqrt((x - v.x) ** 2 + (y - v.y) ** 2),
+    length: () => Math.sqrt(x ** 2 + y ** 2),
   };
 }
 
@@ -93,6 +99,7 @@ function Solver() {
   function update(dt: number) {
     applyGravity();
     applyConstraint();
+    solveCollisions();
     updatePositions(dt);
   }
 
@@ -114,7 +121,7 @@ function Solver() {
 
     for (const object of objects) {
       const delta = object.position().sub(center);
-      const dist = Math.sqrt(delta.x * delta.x + delta.y * delta.y);
+      const dist = delta.length();
       // 20 is ball radius
       if (dist > radius - 20) {
         const n = delta.times(1 / dist);
@@ -123,7 +130,25 @@ function Solver() {
     }
   }
 
-  function get(index: 0) {
+  function solveCollisions() {
+    for (let i = 0; i < objects.length; i++) {
+      for (let j = 0; j < objects.length; j++) {
+        if (i === j) continue;
+        const collisionAxis = objects[i].position().sub(objects[j].position());
+        const distance = collisionAxis.length();
+        const k = 40; // radius of each ball added together
+        if (distance < k) {
+          const n = collisionAxis.times(1 / distance);
+          const delta = k - distance;
+          const move = n.times(delta * 0.5);
+          objects[i].setPosition(objects[i].position().add(move));
+          objects[j].setPosition(objects[j].position().sub(move));
+        }
+      }
+    }
+  }
+
+  function get(index: number) {
     return objects[index];
   }
 
@@ -131,6 +156,7 @@ function Solver() {
     addObject,
     update,
     get,
+    count: () => objects.length,
   };
 }
 
@@ -147,8 +173,6 @@ export default function PhysicsPage() {
   useEffect(() => {
     const ctx = canvas.current?.getContext('2d');
     if (ctx) {
-      let y = 0;
-
       solver.current.addObject(VerletObject(500, 150));
 
       clearInterval(interval.current);
@@ -158,22 +182,24 @@ export default function PhysicsPage() {
         drawBall(ctx, 400, 300, 200, 'white');
 
         solver.current.update(frameTime);
-        const ball = solver.current.get(0);
-
-        drawBall(ctx, ball.position().x, ball.position().y, 20, 'red');
-
-        y += 0.1;
+        for (let i = 0; i < solver.current.count(); i++) {
+          const ball = solver.current.get(i);
+          drawBall(ctx, ball.position().x, ball.position().y, 20, 'red');
+        }
       }, 1000 / 60);
 
       console.log('Physics page loaded');
     }
   });
 
+  function handleClick() {
+    solver.current.addObject(VerletObject(500, 150));
+  }
+
   return (
-    <main>
+    <main onClick={handleClick}>
       <h1>Physics</h1>
       <p>Physics is the science of matter and energy and their interactions.</p>
-
       <canvas ref={canvas} width="800" height="600"></canvas>
     </main>
   );
