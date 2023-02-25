@@ -46,7 +46,7 @@ function getPieceCounts(chess: Chess, color: string) {
   return counts;
 }
 
-const opp = (color: string) => (color === WHITE ? BLACK : WHITE);
+export const opp = (color: string) => (color === WHITE ? BLACK : WHITE);
 
 // Source: https://www.chessprogramming.org/Evaluation
 // Uses both material and mobility to determine the score of the board
@@ -98,14 +98,14 @@ export function getMoveScore(chess: Chess, move: string) {
   return 0;
 }
 
-function getMaterialScore(chess: Chess) {
+function getMaterialScore(chess: Chess, color: string) {
   let material = 0;
   // raw board access
   for (let i = 0; i <= 119; i++) {
     const p = chess['_board'][i];
     if (p) {
       const score = PieceScores[p.type];
-      if (p.color === WHITE) {
+      if (p.color === color) {
         material += score;
       } else {
         material -= score;
@@ -118,6 +118,6 @@ function getMaterialScore(chess: Chess) {
   return material;
 }
 
-export function getBoardEvaluation(chess: Chess) {
-  return getMaterialScore(chess);
+export function getBoardEvaluation(chess: Chess, color: string) {
+  return getMaterialScore(chess, color);
 }

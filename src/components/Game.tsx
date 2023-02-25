@@ -1,6 +1,7 @@
 import { Chess, Square } from 'chess.js';
 import { createContext, useContext, useRef, useState } from 'react';
 import { findMaxMove, getRandomMove } from 'src/utils';
+import abMinMax from 'src/utils/abMinMax';
 
 type Move = string | { from: Square; to: Square };
 
@@ -30,8 +31,10 @@ export function GameProvider({ children }: { children: JSX.Element }) {
   // TODO: Answer should be Bg5 - mate in 2
   const [fen, setFen] = useState('8/2R1BB2/8/4k3/8/2K2P2/8/8 w - - 0 1');
 
+  // Bg5 > Kf5 > Rc5#
+
   const game = useRef(new Chess());
-  const [depth, setDepth] = useState(0);
+  const [depth, setDepth] = useState(1);
 
   game.current.load(fen);
 
@@ -52,7 +55,8 @@ export function GameProvider({ children }: { children: JSX.Element }) {
     if (!game.current.moves()) return undefined;
     console.log('ai thinking...');
     let started = Date.now();
-    const move = findMaxMove(game.current, depth);
+    // const move = findMaxMove(game.current, depth);
+    const move = abMinMax(game.current, depth);
     let took = Date.now() - started;
     console.log('ai move took', took, 'ms');
     return move;

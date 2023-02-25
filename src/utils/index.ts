@@ -3,7 +3,7 @@ import abMinMax from './abMinMax';
 import { getMoveScore } from './evals';
 import minMax from './minMax';
 
-export function findMaxMove(chess: Chess, depth: number) {
+/*export function findMaxMove(chess: Chess, depth: number) {
   let bestScore = -Infinity;
   let bestMove = undefined;
 
@@ -29,7 +29,7 @@ export function findMaxMove(chess: Chess, depth: number) {
 
   console.log('Best move is', bestMove, 'with score', bestScore);
   return bestMove;
-}
+}*/
 
 export function getRandomMove(chess: Chess) {
   const possibleMoves = chess.moves();
