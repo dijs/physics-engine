@@ -1,7 +1,5 @@
 import Vec2 from './Vec2';
 
-// TODO: Add static objects as well which do not move, but collide
-
 export default class VerletObject {
   position: Vec2;
   position_old: Vec2;

@@ -68,8 +68,8 @@ export default class Solver {
           const n = collisionAxis.times(1 / distance);
           const delta = k - distance;
           const move = n.times(delta * 0.5);
-          this.objects[i].setPosition(this.objects[i].position.add(move));
-          this.objects[j].setPosition(this.objects[j].position.sub(move));
+          this.objects[i].move(move);
+          this.objects[j].move(move.negate());
         }
       }
     }

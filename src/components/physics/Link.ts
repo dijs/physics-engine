@@ -14,6 +14,6 @@ export default class Link {
     const delta = this.targetDistance - distance;
     const correction = n.times(delta * 0.5);
     this.a.move(correction);
-    this.b.move(correction.times(-1));
+    this.b.move(correction.negate());
   }
 }

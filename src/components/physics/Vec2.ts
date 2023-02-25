@@ -18,4 +18,7 @@ export default class Vec2 {
   length() {
     return Math.hypot(this.x, this.y);
   }
+  negate() {
+    return this.times(-1);
+  }
 }
