@@ -104,16 +104,20 @@ class VerletCircle extends VerletObject {
 
 function Solver() {
   const objects: VerletCircle[] = [];
+  const subSteps = 2;
 
   function addObject(object: VerletCircle) {
     objects.push(object);
   }
 
   function update(dt: number) {
-    applyGravity();
-    applyConstraint(Vec2(400, 300), 200);
-    solveCollisions();
-    updatePositions(dt);
+    const sub_dt = dt / subSteps;
+    for (let i = 0; i < subSteps; i++) {
+      applyGravity();
+      applyConstraint(Vec2(400, 300), 200);
+      solveCollisions();
+      updatePositions(sub_dt);
+    }
   }
 
   function updatePositions(dt: number) {
@@ -175,11 +179,12 @@ const frameTime = 1 / 60;
 
 export default function PhysicsPage() {
   const canvas = useRef<HTMLCanvasElement>(null);
-
   let interval = useRef<NodeJS.Timeout>();
-
   const solver = useRef(Solver());
+  const mouseDown = useRef(false);
+  const lastSpawn = useRef(0);
 
+  // TODO: Extract this out into a separate component so we don't have to use refs
   useEffect(() => {
     const ctx = canvas.current?.getContext('2d');
     if (ctx) {
@@ -189,8 +194,13 @@ export default function PhysicsPage() {
         // Draw constraint area
         drawBall(ctx, 400, 300, 200, 'white');
         solver.current.update(frameTime);
+        // Draw info
+        const count = solver.current.count();
+        ctx.fillStyle = 'white';
+        ctx.font = '20px Arial';
+        ctx.fillText(`Balls: ${count}`, 10, 30);
         // Draw balls
-        for (let i = 0; i < solver.current.count(); i++) {
+        for (let i = 0; i < count; i++) {
           const ball = solver.current.get(i) as VerletCircle;
           drawBall(
             ctx,
@@ -200,18 +210,23 @@ export default function PhysicsPage() {
             ball.color
           );
         }
+        // Handle user input
+        if (mouseDown.current && Date.now() - lastSpawn.current > 50) {
+          lastSpawn.current = Date.now();
+          solver.current.addObject(
+            // new VerletCircle(500, 150, randomInt(10, 30), randomColor())
+            new VerletCircle(500, 150, randomInt(5, 10), randomColor())
+          );
+        }
       }, 1000 / 60);
     }
   });
 
-  function handleClick() {
-    solver.current.addObject(
-      new VerletCircle(500, 150, randomInt(10, 30), randomColor())
-    );
-  }
-
   return (
-    <main onClick={handleClick}>
+    <main
+      onMouseDown={() => (mouseDown.current = true)}
+      onMouseUp={() => (mouseDown.current = false)}
+    >
       <h1>Physics</h1>
       <p>Physics is the science of matter and energy and their interactions.</p>
       <canvas ref={canvas} width="800" height="600"></canvas>
