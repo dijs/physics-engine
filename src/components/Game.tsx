@@ -1,7 +1,7 @@
 import { Chess, Square } from 'chess.js';
 import { createContext, useContext, useRef, useState } from 'react';
-import { findMaxMove, getRandomMove } from 'src/utils';
 import abMinMax from 'src/utils/abMinMax';
+import randomMove from 'src/utils/random';
 
 type Move = string | { from: Square; to: Square };
 
@@ -72,7 +72,7 @@ export function GameProvider({ children }: { children: JSX.Element }) {
   }
 
   function makeRandomMove() {
-    const move = getRandomMove(game.current);
+    const move = randomMove(game.current);
     if (move) {
       return makeMove(move);
     } else {

@@ -1,7 +1,7 @@
 import { Chess } from 'chess.js';
 import { getBoardEvaluation, opp } from './evals';
 
-export default function (
+export default function abMinMaxRoot(
   game: Chess,
   depth: number,
   isMaximizing: boolean = true

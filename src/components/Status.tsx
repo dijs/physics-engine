@@ -5,9 +5,10 @@ import { getBoardEvaluation } from 'src/utils/evals';
 import { useGame } from './Game';
 
 export default function Status() {
-  const { game, fen, depth, setDepth, makeMove, findAiMove } = useGame();
+  const { game, fen, depth, setDepth, makeMove, findAiMove, makeRandomMove } =
+    useGame();
 
-  function tick() {
+  function makeBestMove() {
     const move = abMinMax(game, depth);
     if (move) {
       makeMove(move);
@@ -38,7 +39,9 @@ export default function Status() {
       </label>
       <br />
       <div>best move: {findAiMove()}</div>
-      <button onClick={tick}>Tick</button>
+      <button onClick={makeBestMove}>Best Move</button>
+      <br />
+      <button onClick={makeRandomMove}>Random Move</button>
     </div>
   );
 }
