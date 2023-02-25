@@ -7,13 +7,14 @@ export default class VerletObject {
   position_old: Vec2;
   acceleration: Vec2;
 
-  constructor(x = 0, y = 0) {
+  constructor(x = 0, y = 0, public isStatic: boolean = false) {
     this.position = new Vec2(x, y);
     this.position_old = new Vec2(x, y);
     this.acceleration = new Vec2();
   }
 
   updatePosition(dt: number) {
+    if (this.isStatic) return;
     const velocity = this.position.sub(this.position_old);
     this.position_old = this.position;
     // Verlet integration
@@ -34,5 +35,10 @@ export default class VerletObject {
 
   setPosition(v: Vec2) {
     this.position = v;
+  }
+
+  move(v: Vec2) {
+    if (this.isStatic) return;
+    this.position = this.position.add(v);
   }
 }

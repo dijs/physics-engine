@@ -3,7 +3,7 @@ import { clearScreen, drawBall, randomColor, randomInt } from './utils';
 import VerletCircle from './VerletCircle';
 
 const frameTime = 1 / 60;
-const spawnTime = 300;
+const spawnTime = 500;
 
 export default class Simulation {
   private solver = new Solver();
@@ -12,7 +12,17 @@ export default class Simulation {
   private times: number[] = [];
   private fps: number = 0;
 
-  constructor(private ctx: CanvasRenderingContext2D) {}
+  constructor(private ctx: CanvasRenderingContext2D) {
+    const objects = [new VerletCircle(390, 150, 10, 'red', true)];
+    for (let i = 0; i < 10; i++) {
+      const ball = new VerletCircle(400, 150 + 20 * i, 7, 'pink');
+      objects.push(ball);
+    }
+    for (const object of objects) {
+      this.solver.addObject(object);
+    }
+    this.solver.addChain(objects, 17);
+  }
 
   start() {
     this.gameLoop();
@@ -55,7 +65,7 @@ export default class Simulation {
         ball.color
       );
     }
-    // Handle user input
+    // Spawn objects
     if (Date.now() - this.lastSpawn > spawnTime) {
       this.lastSpawn = Date.now();
       this.solver.addObject(

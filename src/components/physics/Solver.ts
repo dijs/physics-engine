@@ -1,15 +1,20 @@
+import Chain from './Chain';
 import Vec2 from './Vec2';
 import VerletCircle from './VerletCircle';
 
 export default class Solver {
   private gravity = new Vec2(0, 1000);
   private objects: VerletCircle[] = [];
-  private subSteps = 2;
+  private chains: Chain[] = [];
 
-  constructor() {}
+  constructor(private subSteps: number = 8) {}
 
   addObject(object: VerletCircle) {
     this.objects.push(object);
+  }
+
+  addChain(objects: VerletCircle[], targetDistance: number = 0) {
+    this.chains.push(new Chain(objects, targetDistance));
   }
 
   update(dt: number) {
@@ -19,6 +24,9 @@ export default class Solver {
       // TODO: Should be able to add more constraints
       this.applyConstraint(new Vec2(400, 300), 200);
       this.solveCollisions();
+      for (const chain of this.chains) {
+        chain.apply();
+      }
       this.updatePositions(sub_dt);
     }
   }
