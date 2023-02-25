@@ -44,49 +44,50 @@ function Vec2(x = 0, y = 0) {
   };
 }
 
-type VerletObject = {
-  setPosition: (v: Vec2) => void;
-  position: () => Vec2;
-  updatePosition: (dt: number) => void;
-  accelerate: (acc: Vec2) => void;
-  distance: (v: Vec2) => number;
-};
+class VerletObject {
+  position: Vec2;
+  position_old: Vec2;
+  acceleration: Vec2;
 
-function VerletObject(x = 0, y = 0) {
-  let position_current = Vec2(x, y);
-  let position_old = Vec2(x, y);
-  let acceleration = Vec2();
+  constructor(x = 0, y = 0) {
+    this.position = Vec2(x, y);
+    this.position_old = Vec2(x, y);
+    this.acceleration = Vec2();
+  }
 
-  function updatePosition(dt: number) {
-    const velocity = position_current.sub(position_old);
-    position_old = position_current;
+  updatePosition(dt: number) {
+    const velocity = this.position.sub(this.position_old);
+    this.position_old = this.position;
     // Verlet integration
-    position_current = position_current
+    this.position = this.position
       .add(velocity)
-      .add(acceleration.times(dt * dt));
+      .add(this.acceleration.times(dt * dt));
     // Reset acceleration
-    acceleration = Vec2();
+    this.acceleration = Vec2();
   }
 
-  function accelerate(acc: Vec2) {
-    acceleration = acceleration.add(acc);
+  accelerate(acc: Vec2) {
+    this.acceleration = this.acceleration.add(acc);
   }
 
-  function distance(v: Vec2) {
-    return position_current.distance(v);
+  distance(v: Vec2) {
+    return this.position.distance(v);
   }
 
-  function setPosition(v: Vec2) {
-    position_current = v;
+  setPosition(v: Vec2) {
+    this.position = v;
   }
+}
 
-  return {
-    setPosition,
-    updatePosition,
-    accelerate,
-    distance,
-    position: () => position_current,
-  };
+class VerletCircle extends VerletObject {
+  radius: number;
+  color: string;
+
+  constructor(x = 0, y = 0, radius = 20, color = 'red') {
+    super(x, y);
+    this.radius = radius;
+    this.color = color;
+  }
 }
 
 function Solver() {
@@ -120,7 +121,7 @@ function Solver() {
     const radius = 200;
 
     for (const object of objects) {
-      const delta = object.position().sub(center);
+      const delta = object.position.sub(center);
       const dist = delta.length();
       // 20 is ball radius
       if (dist > radius - 20) {
@@ -130,19 +131,21 @@ function Solver() {
     }
   }
 
+  // TODO: Make this more efficient by using a quadtree
   function solveCollisions() {
     for (let i = 0; i < objects.length; i++) {
       for (let j = 0; j < objects.length; j++) {
         if (i === j) continue;
-        const collisionAxis = objects[i].position().sub(objects[j].position());
+        const collisionAxis = objects[i].position.sub(objects[j].position);
         const distance = collisionAxis.length();
+        // TODO: Make dynamic based on objects
         const k = 40; // radius of each ball added together
         if (distance < k) {
           const n = collisionAxis.times(1 / distance);
           const delta = k - distance;
           const move = n.times(delta * 0.5);
-          objects[i].setPosition(objects[i].position().add(move));
-          objects[j].setPosition(objects[j].position().sub(move));
+          objects[i].setPosition(objects[i].position.add(move));
+          objects[j].setPosition(objects[j].position.sub(move));
         }
       }
     }
@@ -173,7 +176,7 @@ export default function PhysicsPage() {
   useEffect(() => {
     const ctx = canvas.current?.getContext('2d');
     if (ctx) {
-      solver.current.addObject(VerletObject(500, 150));
+      solver.current.addObject(new VerletCircle(500, 150));
 
       clearInterval(interval.current);
       interval.current = setInterval(() => {
@@ -183,8 +186,14 @@ export default function PhysicsPage() {
 
         solver.current.update(frameTime);
         for (let i = 0; i < solver.current.count(); i++) {
-          const ball = solver.current.get(i);
-          drawBall(ctx, ball.position().x, ball.position().y, 20, 'red');
+          const ball = solver.current.get(i) as VerletCircle;
+          drawBall(
+            ctx,
+            ball.position.x,
+            ball.position.y,
+            ball.radius,
+            ball.color
+          );
         }
       }, 1000 / 60);
 
@@ -193,7 +202,7 @@ export default function PhysicsPage() {
   });
 
   function handleClick() {
-    solver.current.addObject(VerletObject(500, 150));
+    solver.current.addObject(new VerletCircle(500, 150));
   }
 
   return (
