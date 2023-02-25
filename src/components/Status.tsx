@@ -1,4 +1,3 @@
-// import { findMaxMove } from 'src/utils';
 import { BLACK, WHITE } from 'chess.js';
 import abMinMax from 'src/utils/abMinMax';
 import { getBoardEvaluation } from 'src/utils/evals';
@@ -38,7 +37,14 @@ export default function Status() {
         />
       </label>
       <br />
-      <div>best move: {findAiMove()}</div>
+      <br />
+      {game.moves().length} possible moves
+      <br />
+      <br />
+      <div>
+        Best move: <b>{findAiMove()}</b>
+      </div>
+      <br />
       <button onClick={makeBestMove}>Best Move</button>
       <br />
       <button onClick={makeRandomMove}>Random Move</button>

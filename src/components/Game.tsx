@@ -27,9 +27,16 @@ export const GameContext = createContext<GameContextType>({
   setDepth: () => false,
 });
 
+// Test algorithm with FEN: 8/2R1BB2/8/4k3/8/2K2P2/8/8 w - - 0 1
+// Moves should be: Bg5 > Kf5 > Rc5#
+
 export function GameProvider({ children }: { children: JSX.Element }) {
   // TODO: Answer should be Bg5 - mate in 2
-  const [fen, setFen] = useState('8/2R1BB2/8/4k3/8/2K2P2/8/8 w - - 0 1');
+  const [fen, setFen] = useState(
+    'rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR w KQkq - 0 1'
+    // '8/pp4pp/2pn1k2/3p1p2/3P1K2/6PP/PPP1B1P1/8 w - - 0 24'
+    // '8/2R1BB2/8/4k3/8/2K2P2/8/8 w - - 0 1'
+  );
 
   // Bg5 > Kf5 > Rc5#
 

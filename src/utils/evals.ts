@@ -82,6 +82,8 @@ function inferPieceType(san: string): string | undefined {
 }
 
 export function getMoveScore(chess: Chess, move: string) {
+  if (move.includes('#')) return 1000;
+  if (move.includes('+')) return 500;
   if (move.includes('x')) {
     const cleanMove = strippedSan(move);
     const squareTaken = cleanMove.split('x')[1] as Square;
@@ -119,5 +121,17 @@ function getMaterialScore(chess: Chess, color: string) {
 }
 
 export function getBoardEvaluation(chess: Chess, color: string) {
-  return getMaterialScore(chess, color);
+  let score = getMaterialScore(chess, color);
+
+  // TODO: I should test the mobility of all the pieces
+
+  // if (chess.isCheck()) {
+  //   if (chess.isCheckmate()) {
+  //     score += 1000;
+  //   } else {
+  //     score += 500;
+  //   }
+  // }
+
+  return score;
 }

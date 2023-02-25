@@ -1,5 +1,5 @@
 import { Chess } from 'chess.js';
-import { getBoardEvaluation, opp } from './evals';
+import { getBoardEvaluation, getMoveScore, opp } from './evals';
 
 export default function abMinMaxRoot(
   game: Chess,
@@ -8,7 +8,12 @@ export default function abMinMaxRoot(
 ) {
   let bestMove = -Infinity;
   let bestMoveFound;
-  const moves = game.moves();
+  let moves = game.moves();
+
+  moves = moves.sort((a, b) => getMoveScore(game, b) - getMoveScore(game, a));
+
+  console.log(moves);
+
   for (let move of moves) {
     game.move(move);
     const value = abMinMax(game, depth - 1, !isMaximizing);
