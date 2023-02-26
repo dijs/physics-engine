@@ -11,7 +11,7 @@ import {
 import VerletCircle from './VerletCircle';
 
 const frameTime = 1 / 60;
-const spawnTime = 1000;
+const spawnTime = 100;
 
 export default class Simulation {
   private solver = new Solver();
@@ -75,12 +75,12 @@ export default class Simulation {
     // Draw balls
     for (let i = 0; i < count; i++) {
       const ball = this.solver.get(i) as VerletCircle;
-      this.ctx.fillStyle = '#90EE90';
+      this.ctx.strokeStyle = '#90EE90';
       // draw grid cell
       const gx = ball.cellIndex % GRID_WIDTH;
       const gy = Math.floor(ball.cellIndex / GRID_WIDTH);
 
-      this.ctx.fillRect(
+      this.ctx.strokeRect(
         gx * CELL_WIDTH,
         gy * CELL_HEIGHT,
         CELL_WIDTH,
