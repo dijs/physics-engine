@@ -7,6 +7,8 @@ export default class Solver {
   private objects: VerletCircle[] = [];
   private chains: Chain[] = [];
 
+  collisionCount = 0;
+
   constructor(private subSteps: number = 8) {}
 
   addObject(object: VerletCircle) {
@@ -56,6 +58,7 @@ export default class Solver {
 
   // TODO: Make this more efficient by using a quadtree
   solveCollisions() {
+    this.collisionCount = 0;
     for (let i = 0; i < this.objects.length; i++) {
       for (let j = 0; j < this.objects.length; j++) {
         if (i === j) continue;
@@ -66,6 +69,7 @@ export default class Solver {
         const radiusSum = this.objects[i].radius + this.objects[j].radius;
         // Detect overlaps
         if (distance < radiusSum) {
+          this.collisionCount++;
           const axis_direction = collisionAxis.times(1 / distance);
           // Calculate the overlap
           const overlap = radiusSum - distance;

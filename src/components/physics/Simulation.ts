@@ -10,7 +10,9 @@ export default class Simulation {
   private shouldStop = false;
   private lastSpawn = Date.now();
   private times: number[] = [];
-  private fps: number = 0;
+
+  public fps: number = 0;
+  public running = false;
 
   constructor(private ctx: CanvasRenderingContext2D) {
     const leftRoot = new VerletCircle(260, 300, 7, 'red', true);
@@ -31,10 +33,14 @@ export default class Simulation {
   }
 
   start() {
+    if (this.running) return;
+    this.shouldStop = false;
+    this.running = true;
     this.gameLoop();
   }
 
   stop() {
+    this.running = false;
     this.shouldStop = true;
   }
 
@@ -60,6 +66,7 @@ export default class Simulation {
     this.ctx.fillText(`Balls: ${count}`, 10, 30);
     this.ctx.font = '13px Arial';
     this.ctx.fillText(`FPS: ${this.fps}`, 10, 50);
+    this.ctx.fillText(`Collisions: ${this.solver.collisionCount}`, 10, 70);
     // Draw balls
     for (let i = 0; i < count; i++) {
       const ball = this.solver.get(i) as VerletCircle;
