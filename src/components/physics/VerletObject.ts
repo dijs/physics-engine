@@ -1,13 +1,16 @@
+import { getCellIndex } from './utils';
 import Vec2 from './Vec2';
 
 export default class VerletObject {
   position: Vec2;
   position_old: Vec2;
   acceleration: Vec2;
+  cellIndex: number;
 
   constructor(x = 0, y = 0, public isStatic: boolean = false) {
     this.position = new Vec2(x, y);
     this.position_old = new Vec2(x, y);
+    this.cellIndex = getCellIndex(x, y);
     this.acceleration = new Vec2();
   }
 
@@ -19,6 +22,7 @@ export default class VerletObject {
     this.position = this.position
       .add(velocity)
       .add(this.acceleration.times(dt * dt));
+    this.cellIndex = getCellIndex(this.position.x, this.position.y);
     // Reset acceleration
     this.acceleration = Vec2.ZERO;
   }

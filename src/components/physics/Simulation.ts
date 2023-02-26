@@ -1,9 +1,17 @@
 import Solver from './Solver';
-import { clearScreen, drawBall, randomColor, randomInt } from './utils';
+import {
+  CELL_HEIGHT,
+  CELL_WIDTH,
+  clearScreen,
+  drawBall,
+  GRID_WIDTH,
+  randomColor,
+  randomInt,
+} from './utils';
 import VerletCircle from './VerletCircle';
 
 const frameTime = 1 / 60;
-const spawnTime = 100;
+const spawnTime = 1000;
 
 export default class Simulation {
   private solver = new Solver();
@@ -15,21 +23,18 @@ export default class Simulation {
   public running = false;
 
   constructor(private ctx: CanvasRenderingContext2D) {
-    const leftRoot = new VerletCircle(260, 300, 7, 'red', true);
-    const rightRoot = new VerletCircle(530, 300, 7, 'red', true);
-
-    const objects = [leftRoot];
-    for (let i = 0; i < 24; i++) {
-      const ball = new VerletCircle(270 + 10 * i, 300, 5, 'orange');
-      objects.push(ball);
-    }
-    objects.push(rightRoot);
-
-    for (const object of objects) {
-      this.solver.addObject(object);
-    }
-
-    this.solver.addChain(objects, 16);
+    // const leftRoot = new VerletCircle(260, 300, 7, 'red', true);
+    // const rightRoot = new VerletCircle(530, 300, 7, 'red', true);
+    // const objects = [leftRoot];
+    // for (let i = 0; i < 24; i++) {
+    //   const ball = new VerletCircle(270 + 10 * i, 300, 5, 'orange');
+    //   objects.push(ball);
+    // }
+    // objects.push(rightRoot);
+    // for (const object of objects) {
+    //   this.solver.addObject(object);
+    // }
+    // this.solver.addChain(objects, 16);
   }
 
   start() {
@@ -58,7 +63,7 @@ export default class Simulation {
     this.solver.update(frameTime);
     clearScreen(this.ctx);
     // Draw constraint area
-    drawBall(this.ctx, 400, 300, 200, 'white');
+    // drawBall(this.ctx, 400, 300, 200, 'white');
     // Draw info
     const count = this.solver.count();
     this.ctx.fillStyle = 'white';
@@ -70,6 +75,18 @@ export default class Simulation {
     // Draw balls
     for (let i = 0; i < count; i++) {
       const ball = this.solver.get(i) as VerletCircle;
+      this.ctx.fillStyle = '#90EE90';
+      // draw grid cell
+      const gx = ball.cellIndex % GRID_WIDTH;
+      const gy = Math.floor(ball.cellIndex / GRID_WIDTH);
+
+      this.ctx.fillRect(
+        gx * CELL_WIDTH,
+        gy * CELL_HEIGHT,
+        CELL_WIDTH,
+        CELL_HEIGHT
+      );
+
       drawBall(
         this.ctx,
         ball.position.x,

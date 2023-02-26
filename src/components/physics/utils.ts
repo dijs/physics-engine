@@ -1,3 +1,19 @@
+export const CANVAS_WIDTH = 800;
+export const CANVAS_HEIGHT = 600;
+
+export const GRID_WIDTH = 8;
+export const GRID_HEIGHT = 6;
+
+export const CELL_WIDTH = CANVAS_WIDTH / GRID_WIDTH;
+export const CELL_HEIGHT = CANVAS_HEIGHT / GRID_HEIGHT;
+
+export function getCellIndex(x: number, y: number) {
+  return (
+    Math.floor((x / CANVAS_WIDTH) * GRID_WIDTH) +
+    Math.floor((y / CANVAS_HEIGHT) * GRID_HEIGHT) * GRID_WIDTH
+  );
+}
+
 export const randomInt = (min: number, max: number) => {
   return Math.floor(Math.random() * (max - min + 1)) + min;
 };
