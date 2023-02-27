@@ -24,11 +24,25 @@ export default function PhysicsPage() {
     }
   }, [running]);
 
+  function handleCanvasClick(e: React.MouseEvent<HTMLCanvasElement>) {
+    const rect = canvas.current?.getBoundingClientRect();
+    if (rect) {
+      const x = e.clientX - rect.left;
+      const y = e.clientY - rect.top;
+      sim.current?.addBall(x, y);
+    }
+  }
+
   return (
     <main>
       <h1>Physics Engine Demo</h1>
       <p>Enjoy!</p>
-      <canvas ref={canvas} width="800" height="600"></canvas>
+      <canvas
+        onClick={handleCanvasClick}
+        ref={canvas}
+        width="800"
+        height="600"
+      ></canvas>
       <button disabled={!running} onClick={() => setRunning(false)}>
         Stop
       </button>
@@ -41,6 +55,13 @@ export default function PhysicsPage() {
         }
       >
         Toggle Grid
+      </button>
+      <button
+        onClick={() =>
+          sim.current && (sim.current.showQuadTree = !sim.current.showQuadTree)
+        }
+      >
+        Toggle QuadTree
       </button>
     </main>
   );

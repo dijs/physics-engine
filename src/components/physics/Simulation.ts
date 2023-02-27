@@ -1,3 +1,4 @@
+import QuadTreeNode from './QuadTreeNode';
 import Solver from './Solver';
 import {
   CELL_HEIGHT,
@@ -11,7 +12,7 @@ import {
 import VerletCircle from './VerletCircle';
 
 const frameTime = 1 / 60;
-const spawnTime = 50;
+const spawnTime = 1000; //50
 
 export default class Simulation {
   private solver = new Solver();
@@ -21,21 +22,42 @@ export default class Simulation {
 
   public fps: number = 0;
   public running = false;
-  public showGrid = true;
+  public showGrid = false;
+  public showQuadTree = true;
 
   constructor(private ctx: CanvasRenderingContext2D) {
-    const leftRoot = new VerletCircle(260, 300, 7, 'red', true);
-    const rightRoot = new VerletCircle(530, 300, 7, 'red', true);
-    const objects = [leftRoot];
-    for (let i = 0; i < 24; i++) {
-      const ball = new VerletCircle(270 + 10 * i, 300, 5, 'orange');
-      objects.push(ball);
+    // const leftRoot = new VerletCircle(260, 300, 7, 'red', true);
+    // const rightRoot = new VerletCircle(530, 300, 7, 'red', true);
+    // const objects = [leftRoot];
+    // for (let i = 0; i < 24; i++) {
+    //   const ball = new VerletCircle(270 + 10 * i, 300, 5, 'orange');
+    //   objects.push(ball);
+    // }
+    // objects.push(rightRoot);
+    // for (const object of objects) {
+    //   this.solver.addObject(object);
+    // }
+    // this.solver.addChain(objects, 16);
+  }
+
+  renderQuadTree(node: QuadTreeNode) {
+    this.ctx.strokeStyle = 'red';
+    this.ctx.strokeRect(
+      node.bounds.x,
+      node.bounds.y,
+      node.bounds.width,
+      node.bounds.height
+    );
+    this.ctx.fillStyle = 'white';
+    this.ctx.font = '12px Arial';
+    this.ctx.fillText(
+      `${node.objects.length}`,
+      node.bounds.x + node.bounds.width / 2,
+      node.bounds.y + node.bounds.height * 0.1
+    );
+    for (const child of node.children) {
+      this.renderQuadTree(child);
     }
-    objects.push(rightRoot);
-    for (const object of objects) {
-      this.solver.addObject(object);
-    }
-    this.solver.addChain(objects, 16);
   }
 
   start() {
@@ -95,6 +117,9 @@ export default class Simulation {
           CELL_HEIGHT
         );
       }
+      if (this.showQuadTree) {
+        this.renderQuadTree(this.solver.quadTree);
+      }
       drawBall(
         this.ctx,
         ball.position.x,
@@ -104,7 +129,8 @@ export default class Simulation {
       );
     }
     // Spawn objects
-    if (this.solver.count() < 800 && Date.now() - this.lastSpawn > spawnTime) {
+    if (this.solver.count() < 13 && Date.now() - this.lastSpawn > spawnTime) {
+      // if (this.solver.count() < 800 && Date.now() - this.lastSpawn > spawnTime) {
       this.lastSpawn = Date.now();
       this.solver.addObject(
         new VerletCircle(500, 150, randomInt(4, 8), randomColor())
@@ -112,5 +138,9 @@ export default class Simulation {
     }
     if (this.shouldStop) return;
     requestAnimationFrame(() => this.gameLoop());
+  }
+
+  addBall(x: number, y: number) {
+    this.solver.addObject(new VerletCircle(x, y, 7, 'purple'));
   }
 }

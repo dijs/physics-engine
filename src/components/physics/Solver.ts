@@ -1,5 +1,7 @@
 import Chain from './Chain';
-import { GRID_HEIGHT, GRID_WIDTH } from './utils';
+import QuadTreeNode from './QuadTreeNode';
+import Rect from './Rect';
+import { CANVAS_HEIGHT, CANVAS_WIDTH, GRID_HEIGHT, GRID_WIDTH } from './utils';
 import Vec2 from './Vec2';
 import VerletCircle from './VerletCircle';
 
@@ -9,6 +11,7 @@ export default class Solver {
   private chains: Chain[] = [];
   private cells: { [key: number]: VerletCircle[] } = {};
 
+  quadTree: QuadTreeNode;
   collisionCount = 0;
   collisionChecks = 0;
 
@@ -16,6 +19,9 @@ export default class Solver {
     for (let i = 0; i < GRID_WIDTH * GRID_HEIGHT; i++) {
       this.cells[i] = [];
     }
+    this.quadTree = new QuadTreeNode(
+      new Rect(0, 0, CANVAS_WIDTH, CANVAS_HEIGHT)
+    );
   }
 
   addObject(object: VerletCircle) {
@@ -41,9 +47,16 @@ export default class Solver {
   }
 
   updatePositions(dt: number) {
+    this.quadTree = new QuadTreeNode(
+      new Rect(0, 0, CANVAS_WIDTH, CANVAS_HEIGHT)
+    );
+
     for (const object of this.objects) {
       const lastCellIndex = object.cellIndex;
       object.updatePosition(dt);
+
+      this.quadTree.insert(object);
+
       const cellIndex = object.cellIndex;
       if (cellIndex !== lastCellIndex) {
         // Remove from old cell
