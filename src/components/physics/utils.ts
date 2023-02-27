@@ -14,6 +14,12 @@ export function getCellIndex(x: number, y: number) {
   );
 }
 
+export function getGridPosition(index: number) {
+  const x = index % GRID_WIDTH;
+  const y = Math.floor(index / GRID_WIDTH);
+  return { x, y };
+}
+
 export const randomInt = (min: number, max: number) => {
   return Math.floor(Math.random() * (max - min + 1)) + min;
 };

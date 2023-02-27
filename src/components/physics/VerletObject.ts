@@ -2,10 +2,12 @@ import { getCellIndex } from './utils';
 import Vec2 from './Vec2';
 
 export default class VerletObject {
+  private position_old: Vec2;
+  private acceleration: Vec2;
+
   position: Vec2;
-  position_old: Vec2;
-  acceleration: Vec2;
   cellIndex: number;
+  handledCollisionDuringFrame: boolean = false;
 
   constructor(x = 0, y = 0, public isStatic: boolean = false) {
     this.position = new Vec2(x, y);
