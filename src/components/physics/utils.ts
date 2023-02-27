@@ -1,8 +1,10 @@
 export const CANVAS_WIDTH = 800;
 export const CANVAS_HEIGHT = 600;
 
-export const GRID_WIDTH = 8 * 3;
-export const GRID_HEIGHT = 6 * 3;
+const grid_scale = 5;
+
+export const GRID_WIDTH = 8 * grid_scale;
+export const GRID_HEIGHT = 6 * grid_scale;
 
 export const CELL_WIDTH = CANVAS_WIDTH / GRID_WIDTH;
 export const CELL_HEIGHT = CANVAS_HEIGHT / GRID_HEIGHT;

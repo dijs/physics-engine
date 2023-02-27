@@ -74,9 +74,10 @@ export default class Simulation {
     this.ctx.fillText(`FPS: ${this.fps}`, 10, 50);
     this.ctx.fillText(`Collisions: ${this.solver.collisionCount}`, 10, 70);
     this.ctx.fillText(
-      `Collision Checks: ${this.solver.collisionChecks} (using grid) / ${
-        count * (count - 1)
-      } (using naive)`,
+      `Collision Checks: ${this.solver.collisionChecks.toLocaleString()} (using grid) / ${(
+        count *
+        (count - 1)
+      ).toLocaleString()} (using naive)`,
       10,
       90
     );

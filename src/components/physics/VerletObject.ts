@@ -1,11 +1,13 @@
 import { getCellIndex } from './utils';
 import Vec2 from './Vec2';
 
-// TODO: Maybe add sleeping to objects
+let id_counter = 0;
+
 export default class VerletObject {
   private position_old: Vec2;
   private acceleration: Vec2;
 
+  id = id_counter++;
   position: Vec2;
   cellIndex: number;
 
