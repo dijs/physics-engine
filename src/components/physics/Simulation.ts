@@ -12,7 +12,7 @@ import {
 import VerletCircle from './VerletCircle';
 
 const frameTime = 1 / 60;
-const spawnTime = 10;
+const spawnTime = 100;
 
 export default class Simulation {
   private solver = new Solver();
@@ -24,18 +24,18 @@ export default class Simulation {
   public running = false;
 
   constructor(private ctx: CanvasRenderingContext2D) {
-    const leftRoot = new VerletCircle(260, 300, 7, 'red', true);
-    const rightRoot = new VerletCircle(530, 300, 7, 'red', true);
-    const objects = [leftRoot];
-    for (let i = 0; i < 24; i++) {
-      const ball = new VerletCircle(270 + 10 * i, 300, 5, 'orange');
-      objects.push(ball);
-    }
-    objects.push(rightRoot);
-    for (const object of objects) {
-      this.solver.addObject(object);
-    }
-    this.solver.addChain(objects, 16);
+    // const leftRoot = new VerletCircle(260, 300, 7, 'red', true);
+    // const rightRoot = new VerletCircle(530, 300, 7, 'red', true);
+    // const objects = [leftRoot];
+    // for (let i = 0; i < 24; i++) {
+    //   const ball = new VerletCircle(270 + 10 * i, 300, 5, 'orange');
+    //   objects.push(ball);
+    // }
+    // objects.push(rightRoot);
+    // for (const object of objects) {
+    //   this.solver.addObject(object);
+    // }
+    // this.solver.addChain(objects, 16);
   }
 
   start() {
@@ -73,6 +73,14 @@ export default class Simulation {
     this.ctx.font = '13px Arial';
     this.ctx.fillText(`FPS: ${this.fps}`, 10, 50);
     this.ctx.fillText(`Collisions: ${this.solver.collisionCount}`, 10, 70);
+    this.ctx.fillText(
+      `Collision Checks: ${this.solver.collisionChecks} / ${
+        count * (count - 1)
+      }`,
+      10,
+      90
+    );
+    this.ctx.fillText(`Debug: ${this.solver.debug}`, 10, 110);
     // Draw balls
     for (let i = 0; i < count; i++) {
       const ball = this.solver.get(i) as VerletCircle;
@@ -95,7 +103,8 @@ export default class Simulation {
       );
     }
     // Spawn objects
-    if (this.solver.count() < 300 && Date.now() - this.lastSpawn > spawnTime) {
+    // if (this.solver.count() < 32 && Date.now() - this.lastSpawn > spawnTime) {
+    if (Date.now() - this.lastSpawn > spawnTime) {
       this.lastSpawn = Date.now();
       this.solver.addObject(
         new VerletCircle(500, 150, randomInt(4, 8), randomColor())

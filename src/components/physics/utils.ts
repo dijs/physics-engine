@@ -1,8 +1,8 @@
 export const CANVAS_WIDTH = 800;
 export const CANVAS_HEIGHT = 600;
 
-export const GRID_WIDTH = 16;
-export const GRID_HEIGHT = 12;
+export const GRID_WIDTH = 8 * 3;
+export const GRID_HEIGHT = 6 * 3;
 
 export const CELL_WIDTH = CANVAS_WIDTH / GRID_WIDTH;
 export const CELL_HEIGHT = CANVAS_HEIGHT / GRID_HEIGHT;
@@ -12,6 +12,10 @@ export function getCellIndex(x: number, y: number) {
     Math.floor((x / CANVAS_WIDTH) * GRID_WIDTH) +
     Math.floor((y / CANVAS_HEIGHT) * GRID_HEIGHT) * GRID_WIDTH
   );
+}
+
+export function getCellIndexFromGridPosition(x: number, y: number) {
+  return x + y * GRID_WIDTH;
 }
 
 export function getGridPosition(index: number) {

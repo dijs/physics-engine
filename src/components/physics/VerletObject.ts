@@ -4,6 +4,11 @@ import Vec2 from './Vec2';
 export default class VerletObject {
   private position_old: Vec2;
   private acceleration: Vec2;
+  // private sleepChecks = 0;
+
+  // sleeping: boolean = false;
+
+  lastSpeed: number = 0;
 
   position: Vec2;
   cellIndex: number;
@@ -16,9 +21,26 @@ export default class VerletObject {
     this.acceleration = new Vec2();
   }
 
+  // speed() {
+  //   return this.position.sub(this.position_old).length();
+  // }
+
   updatePosition(dt: number) {
     if (this.isStatic) return;
+    // if (this.sleeping) return;
+
     const velocity = this.position.sub(this.position_old);
+
+    this.lastSpeed = velocity.length();
+
+    // if (velocity.length() < 0.05) {
+    //   this.sleepChecks++;
+    //   if (this.sleepChecks > 10) {
+    //     this.sleeping = true;
+    //     this.sleepChecks = 0;
+    //   }
+    // }
+
     this.position_old = this.position;
     // Verlet integration
     this.position = this.position
