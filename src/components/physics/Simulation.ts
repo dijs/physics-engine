@@ -12,7 +12,7 @@ import {
 import VerletCircle from './VerletCircle';
 
 const frameTime = 1 / 60;
-const spawnTime = 100;
+const spawnTime = 50;
 
 export default class Simulation {
   private solver = new Solver();
@@ -80,7 +80,6 @@ export default class Simulation {
       10,
       90
     );
-    this.ctx.fillText(`Debug: ${this.solver.debug}`, 10, 110);
     // Draw balls
     for (let i = 0; i < count; i++) {
       const ball = this.solver.get(i) as VerletCircle;

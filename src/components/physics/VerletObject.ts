@@ -5,7 +5,6 @@ export default class VerletObject {
   private position_old: Vec2;
   private acceleration: Vec2;
   // private sleepChecks = 0;
-
   // sleeping: boolean = false;
 
   lastSpeed: number = 0;
