@@ -26,8 +26,8 @@ export default function PhysicsPage() {
 
   return (
     <main>
-      <h1>Physics</h1>
-      <p>Physics is the science of matter and energy and their interactions.</p>
+      <h1>Physics Engine Demo</h1>
+      <p>Enjoy!</p>
       <canvas ref={canvas} width="800" height="600"></canvas>
       <button disabled={!running} onClick={() => setRunning(false)}>
         Stop
