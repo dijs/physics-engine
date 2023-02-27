@@ -5,7 +5,6 @@ import {
   clearScreen,
   drawBall,
   getGridPosition,
-  GRID_WIDTH,
   randomColor,
   randomInt,
 } from './utils';
@@ -22,20 +21,21 @@ export default class Simulation {
 
   public fps: number = 0;
   public running = false;
+  public showGrid = true;
 
   constructor(private ctx: CanvasRenderingContext2D) {
-    // const leftRoot = new VerletCircle(260, 300, 7, 'red', true);
-    // const rightRoot = new VerletCircle(530, 300, 7, 'red', true);
-    // const objects = [leftRoot];
-    // for (let i = 0; i < 24; i++) {
-    //   const ball = new VerletCircle(270 + 10 * i, 300, 5, 'orange');
-    //   objects.push(ball);
-    // }
-    // objects.push(rightRoot);
-    // for (const object of objects) {
-    //   this.solver.addObject(object);
-    // }
-    // this.solver.addChain(objects, 16);
+    const leftRoot = new VerletCircle(260, 300, 7, 'red', true);
+    const rightRoot = new VerletCircle(530, 300, 7, 'red', true);
+    const objects = [leftRoot];
+    for (let i = 0; i < 24; i++) {
+      const ball = new VerletCircle(270 + 10 * i, 300, 5, 'orange');
+      objects.push(ball);
+    }
+    objects.push(rightRoot);
+    for (const object of objects) {
+      this.solver.addObject(object);
+    }
+    this.solver.addChain(objects, 16);
   }
 
   start() {
@@ -64,7 +64,7 @@ export default class Simulation {
     this.solver.update(frameTime);
     clearScreen(this.ctx);
     // Draw constraint area
-    // drawBall(this.ctx, 400, 300, 200, 'white');
+    drawBall(this.ctx, 400, 300, 200, 'rgba(255, 255, 255, 0.1)');
     // Draw info
     const count = this.solver.count();
     this.ctx.fillStyle = 'white';
@@ -85,14 +85,15 @@ export default class Simulation {
       const ball = this.solver.get(i) as VerletCircle;
       this.ctx.strokeStyle = '#90EE90';
       // draw grid cell
-      const pos = getGridPosition(ball.cellIndex);
-      this.ctx.strokeRect(
-        pos.x * CELL_WIDTH,
-        pos.y * CELL_HEIGHT,
-        CELL_WIDTH,
-        CELL_HEIGHT
-      );
-
+      if (this.showGrid) {
+        const pos = getGridPosition(ball.cellIndex);
+        this.ctx.strokeRect(
+          pos.x * CELL_WIDTH,
+          pos.y * CELL_HEIGHT,
+          CELL_WIDTH,
+          CELL_HEIGHT
+        );
+      }
       drawBall(
         this.ctx,
         ball.position.x,
@@ -102,8 +103,7 @@ export default class Simulation {
       );
     }
     // Spawn objects
-    // if (this.solver.count() < 32 && Date.now() - this.lastSpawn > spawnTime) {
-    if (Date.now() - this.lastSpawn > spawnTime) {
+    if (this.solver.count() < 800 && Date.now() - this.lastSpawn > spawnTime) {
       this.lastSpawn = Date.now();
       this.solver.addObject(
         new VerletCircle(500, 150, randomInt(4, 8), randomColor())
