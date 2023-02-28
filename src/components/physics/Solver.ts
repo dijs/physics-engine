@@ -1,9 +1,14 @@
 import Chain from './Chain';
 import Circle from './Circle';
-import Cricle from './Circle';
 import QuadTreeNode from './QuadTreeNode';
 import Rect from './Rect';
-import { CANVAS_HEIGHT, CANVAS_WIDTH, GRID_HEIGHT, GRID_WIDTH } from './utils';
+import {
+  CANVAS_HEIGHT,
+  CANVAS_WIDTH,
+  CollisionCheck,
+  GRID_HEIGHT,
+  GRID_WIDTH,
+} from './utils';
 import Vec2 from './Vec2';
 import VerletCircle from './VerletCircle';
 
@@ -13,6 +18,7 @@ export default class Solver {
   private chains: Chain[] = [];
   private cells: { [key: number]: VerletCircle[] } = {};
 
+  check: CollisionCheck = CollisionCheck.QuadTree;
   quadTree: QuadTreeNode;
   collisionCount = 0;
   collisionChecks = 0;
@@ -40,8 +46,15 @@ export default class Solver {
       this.applyGravity();
       // TODO: Should be able to add more constraints
       this.applyConstraint(new Vec2(400, 300), 200);
-      // this.solveGridCollisions();
-      this.solveQuadTreeCollisions();
+      if (this.check === CollisionCheck.Grid) {
+        this.solveGridCollisions();
+      }
+      if (this.check === CollisionCheck.QuadTree) {
+        this.solveQuadTreeCollisions();
+      }
+      if (this.check === CollisionCheck.Naive) {
+        this.solveNaiveCollisions();
+      }
       for (const chain of this.chains) {
         chain.apply();
       }
@@ -50,25 +63,29 @@ export default class Solver {
   }
 
   updatePositions(dt: number) {
-    this.quadTree = new QuadTreeNode(
-      new Rect(0, 0, CANVAS_WIDTH, CANVAS_HEIGHT)
-    );
-
+    if (this.check === CollisionCheck.QuadTree) {
+      this.quadTree = new QuadTreeNode(
+        new Rect(0, 0, CANVAS_WIDTH, CANVAS_HEIGHT)
+      );
+    }
     for (const object of this.objects) {
       const lastCellIndex = object.cellIndex;
       object.updatePosition(dt);
-
-      this.quadTree.insert(object);
-
-      const cellIndex = object.cellIndex;
-      if (cellIndex !== lastCellIndex) {
-        // Remove from old cell
-        this.cells[lastCellIndex].splice(
-          this.cells[lastCellIndex].indexOf(object),
-          1
-        );
-        // Add to new cell
-        this.cells[cellIndex].push(object);
+      if (this.check === CollisionCheck.QuadTree) {
+        // TODO: Update the returns.... in insert
+        this.quadTree.insert(object);
+      }
+      if (this.check === CollisionCheck.Grid) {
+        const cellIndex = object.cellIndex;
+        if (cellIndex !== lastCellIndex) {
+          // Remove from old cell
+          this.cells[lastCellIndex].splice(
+            this.cells[lastCellIndex].indexOf(object),
+            1
+          );
+          // Add to new cell
+          this.cells[cellIndex].push(object);
+        }
       }
     }
   }
@@ -140,6 +157,16 @@ export default class Solver {
         if (object1 !== object2) {
           this.solveCollision(object1, object2);
         }
+      }
+    }
+  }
+
+  solveNaiveCollisions() {
+    this.collisionCount = 0;
+    this.collisionChecks = 0;
+    for (let i = 0; i < this.objects.length - 1; i++) {
+      for (let j = i + 1; j < this.objects.length; j++) {
+        this.solveCollision(this.objects[i], this.objects[j]);
       }
     }
   }

@@ -1,3 +1,9 @@
+export enum CollisionCheck {
+  Naive = 'Naive',
+  Grid = 'Grid',
+  QuadTree = 'QuadTree',
+}
+
 export const CANVAS_WIDTH = 800;
 export const CANVAS_HEIGHT = 600;
 

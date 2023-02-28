@@ -4,6 +4,7 @@ import {
   CELL_HEIGHT,
   CELL_WIDTH,
   clearScreen,
+  CollisionCheck,
   drawBall,
   getGridPosition,
   randomColor,
@@ -12,7 +13,7 @@ import {
 import VerletCircle from './VerletCircle';
 
 const frameTime = 1 / 60;
-const spawnTime = 50;
+const spawnTime = 70;
 
 export default class Simulation {
   private solver = new Solver();
@@ -38,6 +39,10 @@ export default class Simulation {
       this.solver.addObject(object);
     }
     this.solver.addChain(objects, 16);
+  }
+
+  setCheck(type: CollisionCheck) {
+    this.solver.check = type;
   }
 
   renderQuadTree(node: QuadTreeNode) {
@@ -96,10 +101,9 @@ export default class Simulation {
     this.ctx.fillText(`FPS: ${this.fps}`, 10, 50);
     this.ctx.fillText(`Collisions: ${this.solver.collisionCount}`, 10, 70);
     this.ctx.fillText(
-      `Collision Checks: ${this.solver.collisionChecks.toLocaleString()} (using grid) / ${(
-        count *
-        (count - 1)
-      ).toLocaleString()} (using naive)`,
+      `Collision Checks: ${this.solver.collisionChecks.toLocaleString()} (using ${
+        this.solver.check
+      })`,
       10,
       90
     );
@@ -129,7 +133,6 @@ export default class Simulation {
       );
     }
     // Spawn objects
-    // if (this.solver.count() < 13 && Date.now() - this.lastSpawn > spawnTime) {
     if (this.solver.count() < 800 && Date.now() - this.lastSpawn > spawnTime) {
       this.lastSpawn = Date.now();
       this.solver.addObject(

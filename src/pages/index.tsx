@@ -1,4 +1,5 @@
 import Simulation from 'components/physics/Simulation';
+import { CollisionCheck } from 'components/physics/utils';
 import { useEffect, useRef, useState } from 'react';
 
 export default function PhysicsPage() {
@@ -60,6 +61,25 @@ export default function PhysicsPage() {
         }
       >
         Toggle QuadTree
+      </button>
+      <button
+        onClick={() =>
+          sim.current && sim.current.setCheck(CollisionCheck.Naive)
+        }
+      >
+        Use Naive
+      </button>
+      <button
+        onClick={() => sim.current && sim.current.setCheck(CollisionCheck.Grid)}
+      >
+        Use Grid
+      </button>
+      <button
+        onClick={() =>
+          sim.current && sim.current.setCheck(CollisionCheck.QuadTree)
+        }
+      >
+        Use QuadTree
       </button>
     </main>
   );
