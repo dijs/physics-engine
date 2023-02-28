@@ -34,8 +34,7 @@ export default function PhysicsPage() {
 
   return (
     <main>
-      <h1>Physics Engine Demo</h1>
-      <p>Enjoy!</p>
+      <h1>Demo</h1>
       <canvas
         onClick={handleCanvasClick}
         ref={canvas}
@@ -82,6 +81,7 @@ export default function PhysicsPage() {
       >
         Use QuadTree
       </button>
+      <button onClick={() => sim.current && sim.current.reset()}>Reset</button>
     </main>
   );
 }

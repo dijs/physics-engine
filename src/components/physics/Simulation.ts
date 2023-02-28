@@ -27,6 +27,10 @@ export default class Simulation {
   public showQuadTree = false;
 
   constructor(private ctx: CanvasRenderingContext2D) {
+    this.addChain();
+  }
+
+  addChain() {
     const leftRoot = new VerletCircle(260, 300, 7, 'red', true);
     const rightRoot = new VerletCircle(530, 300, 7, 'red', true);
     const objects = [leftRoot];
@@ -39,6 +43,18 @@ export default class Simulation {
       this.solver.addObject(object);
     }
     this.solver.addChain(objects, 16);
+  }
+
+  reset() {
+    this.solver = new Solver();
+    this.shouldStop = false;
+    this.lastSpawn = Date.now();
+    this.times = [];
+    this.fps = 0;
+    this.running = false;
+    this.showGrid = false;
+    this.showQuadTree = false;
+    this.addChain();
   }
 
   setCheck(type: CollisionCheck) {
