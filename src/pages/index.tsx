@@ -1,8 +1,6 @@
 import Simulation from 'components/physics/Simulation';
 import { useEffect, useRef, useState } from 'react';
 
-// Source: https://www.youtube.com/watch?v=lS_qeBy3aQI
-
 export default function PhysicsPage() {
   const canvas = useRef<HTMLCanvasElement>(null);
   const sim = useRef<Simulation | null>(null);

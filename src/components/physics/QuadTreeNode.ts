@@ -1,12 +1,41 @@
 import Rect from './Rect';
 import VerletObject from './VerletObject';
 
-// Source: https://gamedev.stackexchange.com/questions/10202/quad-trees-grid-based-collision-putting-logic-into-action/10253#10253
 export default class QuadTreeNode {
   objects: VerletObject[] = [];
   children: QuadTreeNode[] = [];
 
   constructor(public bounds: Rect, private capacity: number = 4) {}
+
+  search(x: number, y: number): QuadTreeNode | null {
+    if (this.children.length === 0) {
+      return this;
+    }
+    for (const child of this.children) {
+      if (child.bounds.contains(x, y)) {
+        return child.search(x, y);
+      }
+    }
+    return null;
+  }
+
+  query(range: Rect): VerletObject[] {
+    const found: VerletObject[] = [];
+    if (!this.bounds.intersects(range)) {
+      return found;
+    }
+    for (const object of this.objects) {
+      if (range.contains(object.position.x, object.position.y)) {
+        found.push(object);
+      }
+    }
+    if (this.children.length > 0) {
+      for (const child of this.children) {
+        found.push(...child.query(range));
+      }
+    }
+    return found;
+  }
 
   insert(object: VerletObject) {
     if (!this.bounds.contains(object.position.x, object.position.y)) {

@@ -38,7 +38,8 @@ export default class Solver {
       this.applyGravity();
       // TODO: Should be able to add more constraints
       this.applyConstraint(new Vec2(400, 300), 200);
-      this.solveGridCollisions();
+      // this.solveGridCollisions();
+      this.solveQuadTreeCollisions();
       for (const chain of this.chains) {
         chain.apply();
       }
@@ -89,6 +90,26 @@ export default class Solver {
 
   getObjectsInCell(cellIndex: number) {
     return this.objects.filter((object) => object.cellIndex === cellIndex);
+  }
+
+  solveQuadTreeCollisions() {
+    this.collisionCount = 0;
+    this.collisionChecks = 0;
+    for (let object of this.objects) {
+      const r = object.radius * 2;
+      const rect = new Rect(
+        object.position.x - r,
+        object.position.y - r,
+        r * 2,
+        r * 2
+      );
+      const objects = this.quadTree.query(rect) as VerletCircle[];
+      for (const other of objects) {
+        if (object !== other) {
+          this.solveCollision(object, other);
+        }
+      }
+    }
   }
 
   solveGridCollisions() {

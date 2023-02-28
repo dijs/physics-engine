@@ -14,4 +14,13 @@ export default class Rect {
       y > this.y + this.height;
     return !outside;
   }
+
+  intersects(other: Rect) {
+    const outside =
+      other.x > this.x + this.width ||
+      other.x + other.width < this.x ||
+      other.y > this.y + this.height ||
+      other.y + other.height < this.y;
+    return !outside;
+  }
 }
