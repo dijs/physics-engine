@@ -1,3 +1,4 @@
+import Circle from './Circle';
 import Rect from './Rect';
 import VerletObject from './VerletObject';
 
@@ -7,19 +8,7 @@ export default class QuadTreeNode {
 
   constructor(public bounds: Rect, private capacity: number = 4) {}
 
-  search(x: number, y: number): QuadTreeNode | null {
-    if (this.children.length === 0) {
-      return this;
-    }
-    for (const child of this.children) {
-      if (child.bounds.contains(x, y)) {
-        return child.search(x, y);
-      }
-    }
-    return null;
-  }
-
-  query(range: Rect): VerletObject[] {
+  query(range: Circle): VerletObject[] {
     const found: VerletObject[] = [];
     if (!this.bounds.intersects(range)) {
       return found;

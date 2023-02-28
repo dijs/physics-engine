@@ -1,4 +1,6 @@
 import Chain from './Chain';
+import Circle from './Circle';
+import Cricle from './Circle';
 import QuadTreeNode from './QuadTreeNode';
 import Rect from './Rect';
 import { CANVAS_HEIGHT, CANVAS_WIDTH, GRID_HEIGHT, GRID_WIDTH } from './utils';
@@ -96,14 +98,12 @@ export default class Solver {
     this.collisionCount = 0;
     this.collisionChecks = 0;
     for (let object of this.objects) {
-      const r = object.radius * 2;
-      const rect = new Rect(
-        object.position.x - r,
-        object.position.y - r,
-        r * 2,
-        r * 2
+      const range = new Circle(
+        object.position.x,
+        object.position.y,
+        object.radius * 2
       );
-      const objects = this.quadTree.query(rect) as VerletCircle[];
+      const objects = this.quadTree.query(range) as VerletCircle[];
       for (const other of objects) {
         if (object !== other) {
           this.solveCollision(object, other);

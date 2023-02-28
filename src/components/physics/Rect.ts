@@ -1,3 +1,5 @@
+import Circle from './Circle';
+
 export default class Rect {
   constructor(
     public x: number,
@@ -15,12 +17,10 @@ export default class Rect {
     return !outside;
   }
 
-  intersects(other: Rect) {
-    const outside =
-      other.x > this.x + this.width ||
-      other.x + other.width < this.x ||
-      other.y > this.y + this.height ||
-      other.y + other.height < this.y;
-    return !outside;
+  intersects(other: Circle) {
+    const x = Math.max(this.x, Math.min(other.x, this.x + this.width));
+    const y = Math.max(this.y, Math.min(other.y, this.y + this.height));
+    const distance = Math.hypot(x - other.x, y - other.y);
+    return distance < other.radius;
   }
 }
