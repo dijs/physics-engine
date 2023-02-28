@@ -28,19 +28,22 @@ export default class QuadTreeNode {
 
   insert(object: VerletObject) {
     if (!this.bounds.contains(object.position.x, object.position.y)) {
-      return;
+      return false;
     }
-
     if (this.objects.length < this.capacity) {
       this.objects.push(object);
+      return true;
     } else {
       if (this.children.length === 0) {
         this.subdivide();
       }
       for (const child of this.children) {
-        child.insert(object);
+        if (child.insert(object)) {
+          return true;
+        }
       }
     }
+    return false;
   }
 
   subdivide() {

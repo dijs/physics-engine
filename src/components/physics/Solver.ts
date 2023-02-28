@@ -18,7 +18,7 @@ export default class Solver {
   private chains: Chain[] = [];
   private cells: { [key: number]: VerletCircle[] } = {};
 
-  check: CollisionCheck = CollisionCheck.QuadTree;
+  check: CollisionCheck = CollisionCheck.Grid;
   quadTree: QuadTreeNode;
   collisionCount = 0;
   collisionChecks = 0;

@@ -42,6 +42,7 @@ export default function PhysicsPage() {
         width="800"
         height="600"
       ></canvas>
+      <br />
       <button disabled={!running} onClick={() => setRunning(false)}>
         Stop
       </button>

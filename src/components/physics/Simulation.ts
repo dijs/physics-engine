@@ -13,7 +13,7 @@ import {
 import VerletCircle from './VerletCircle';
 
 const frameTime = 1 / 60;
-const spawnTime = 70;
+const spawnTime = 60;
 
 export default class Simulation {
   private solver = new Solver();
@@ -24,7 +24,7 @@ export default class Simulation {
   public fps: number = 0;
   public running = false;
   public showGrid = false;
-  public showQuadTree = true;
+  public showQuadTree = false;
 
   constructor(private ctx: CanvasRenderingContext2D) {
     const leftRoot = new VerletCircle(260, 300, 7, 'red', true);
